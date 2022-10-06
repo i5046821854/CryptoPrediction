@@ -50,8 +50,45 @@ public class PriceActivity  extends AppCompatActivity {
         String name = intent.getStringExtra("name");
         cryptoTxt.setText(name);
         searchPrice(name);
+        searchRealPrice(name);
     }
 
+    void searchRealPrice(String name)
+    {
+        String crypto = name.toLowerCase(Locale.ROOT);
+        OkHttpClient client = new OkHttpClient.Builder().build();
+        HttpUrl.Builder urlBuilder;
+        urlBuilder = HttpUrl.parse("http://10.0.2.2:8080/real/"+crypto).newBuilder();
+        String url = urlBuilder.build().toString();
+        Request req = new Request.Builder().url(url).build();
+        client.newCall(req).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                System.out.println(e.toString());
+
+                PriceActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(PriceActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
+                    }
+                });                }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                final String myResponse = response.body().string();
+                Gson gson = new GsonBuilder().create();
+                System.out.println(myResponse);
+                Type collectionType = new TypeToken<List<CryptoPrice>>(){}.getType();
+                List<CryptoPrice> cryptoCurrencies = (List<CryptoPrice>) new Gson()
+                        .fromJson( myResponse , collectionType);
+                for(CryptoPrice crypto : cryptoCurrencies)
+                {
+                    System.out.println(crypto.getTime() + crypto.getClose());
+                }
+            }
+        });
+
+    }
     void searchPrice(String name)
     {
         String crypto = name.toLowerCase(Locale.ROOT);
