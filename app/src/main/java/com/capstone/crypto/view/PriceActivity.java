@@ -1,13 +1,18 @@
 package com.capstone.crypto.view;
 
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.capstone.crypto.R;
@@ -45,6 +50,11 @@ public class PriceActivity  extends AppCompatActivity {
     Button searchBtn;
     LineChart chart;
     Thread thread;
+    ImageView imageView;
+    ProgressDialog dialog;
+    Integer choosed = 1;
+    String name;
+
     int i = 0;
     List<CryptoPrice> cryptoCurrencies;
     @Override
@@ -53,20 +63,60 @@ public class PriceActivity  extends AppCompatActivity {
         setContentView(R.layout.activity_price);
         searchBtn = findViewById(R.id.searchBtn2);
         cryptoTxt = findViewById(R.id.searchBox);
+        imageView = findViewById(R.id.imageView2);
         chart = findViewById(R.id.bar);
+        dialog = new ProgressDialog(PriceActivity.this);
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        dialog.setMessage("Chart processing...");
         initView();
         searchBtn.setOnClickListener(view -> {
             String crypto = cryptoTxt.getText().toString();
-            searchPrice(crypto);
+            name = crypto;
+            searchPrice(crypto, choosed);
         });
     }
 
     void initView()
     {
         Intent intent = getIntent();
-        String name = intent.getStringExtra("name");
+        name = intent.getStringExtra("name");
         cryptoTxt.setText(name);
-        searchPrice(name);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            int tempChoosed = choosed;
+            @Override
+            public void onClick(View view) {
+                final String[] items = new String[]{"HOUR", "DAY", "WEEK", "MONTH"};
+                final Integer[] mappedItems = new Integer[]{1,2,3,4};
+                AlertDialog.Builder dialog = new AlertDialog.Builder(PriceActivity.this);
+                dialog.setTitle("Choose Time Period")
+                        .setSingleChoiceItems(items
+                                , -1
+                                , new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        tempChoosed = mappedItems[i];
+                                    }
+                                })
+                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                if(choosed != tempChoosed){
+                                    choosed = tempChoosed;
+                                    searchRealPrice(name, choosed);
+                                    Toast.makeText(PriceActivity.this, "COMPLETE!", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        }).setNeutralButton("취소", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Toast.makeText(PriceActivity.this, "취소되었습니다", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                dialog.create();
+                dialog.show();
+            }
+        });
+        searchPrice(name, choosed);
     }
 
     public ArrayList<String> getAreaCount() {
@@ -111,6 +161,7 @@ public class PriceActivity  extends AppCompatActivity {
     }
 
     void addEntry() {
+        int size = cryptoCurrencies.size();
         System.out.println(i);
         LineData data = chart.getData();
         LineDataSet set = (LineDataSet) data.getDataSetByIndex(0);
@@ -120,7 +171,7 @@ public class PriceActivity  extends AppCompatActivity {
         }
         i = 0;
         while (true) {
-            if (i == 2400) {
+            if (i == size) {
                 i = 0;
                 break;
             }
@@ -129,9 +180,8 @@ public class PriceActivity  extends AppCompatActivity {
         }
         data.notifyDataChanged();
         chart.notifyDataSetChanged();
-        chart.setVisibleXRangeMaximum(1000);
+        chart.setVisibleXRangeMaximum(size / 2);
         chart.moveViewToX(data.getEntryCount());
-
     }
 
     private LineDataSet createSet()
@@ -147,12 +197,18 @@ public class PriceActivity  extends AppCompatActivity {
         set.setDrawValues(false);
         return set;
     }
-    void searchRealPrice(String name)
+    void searchRealPrice(String name, int num)
     {
+        PriceActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                dialog.show();
+            }
+        });
         String crypto = name.toLowerCase(Locale.ROOT);
         OkHttpClient client = new OkHttpClient.Builder().build();
         HttpUrl.Builder urlBuilder;
-        urlBuilder = HttpUrl.parse("https://jongseol-crypto.herokuapp.com/real/"+crypto).newBuilder();
+        urlBuilder = HttpUrl.parse("https://jongseol-crypto.herokuapp.com/real/"+ num + "/"+crypto).newBuilder();
         String url = urlBuilder.build().toString();
         Request req = new Request.Builder().url(url).build();
         client.newCall(req).enqueue(new Callback() {
@@ -176,11 +232,12 @@ public class PriceActivity  extends AppCompatActivity {
                 cryptoCurrencies = (List<CryptoPrice>) new Gson()
                         .fromJson( myResponse , collectionType);
                 drawLineChart();
+                dialog.dismiss();
             }
         });
 
     }
-    void searchPrice(String name)
+    void searchPrice(String name, int num)
     {
         String crypto = name.toLowerCase(Locale.ROOT);
         OkHttpClient client = new OkHttpClient.Builder().build();
@@ -192,7 +249,6 @@ public class PriceActivity  extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 System.out.println(e.toString());
-
                 PriceActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -209,7 +265,7 @@ public class PriceActivity  extends AppCompatActivity {
                 try{
                     List<CryptoCurrency> cryptoCurrencies = (List<CryptoCurrency>) new Gson()
                             .fromJson( myResponse , collectionType);
-                    searchRealPrice(name);
+                    searchRealPrice(name, num);
                 }catch (JsonSyntaxException e)
                 {
                     System.out.println("asd");
