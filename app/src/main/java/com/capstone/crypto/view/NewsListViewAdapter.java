@@ -2,6 +2,7 @@ package com.capstone.crypto.view;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ public class NewsListViewAdapter extends BaseAdapter {
 
     private Context mContext;
     private ArrayList<News> items;
+    private Button readFullBtn;
 
     public NewsListViewAdapter(Context mContext, ArrayList<News> items) {
         this.mContext = mContext;
@@ -60,7 +62,7 @@ public class NewsListViewAdapter extends BaseAdapter {
         }
 
         TextView titleTxt  = (TextView)view.findViewById(R.id.titleTxt2);
-        Button detailBtn = (Button) view.findViewById(R.id.detailBtn);
+        readFullBtn = (Button)view.findViewById(R.id.detailBtn);
         String id = items.get(i).getId();
         String author = (items.get(i).getAuthor() == null)? " " : items.get(i).getAuthor();
         String title = (items.get(i).getTitle() == null)? " ": items.get(i).getTitle();
@@ -68,21 +70,10 @@ public class NewsListViewAdapter extends BaseAdapter {
 //            title = title.substring(0, 50);
         titleTxt.setText(title);
         //authorTxt.setText(author);
-
-//        detailBtn.setOnClickListener(view1 -> {
-//            Intent intent = new Intent(mContext, NewsDetailActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//            System.out.println(items.get(i).getImage());
-//            intent.putExtra(EXT_TITLE, items.get(i).getTitle());
-//            intent.putExtra(EXT_DESC, items.get(i).getDescription());
-//            intent.putExtra(EXT_URL, items.get(i).getUrl());
-//            intent.putExtra(EXT_AUTHOR, items.get(i).getAuthor());
-//            intent.putExtra(EXT_IMAGE, items.get(i).getImage());
-//            intent.putExtra(EXT_LANG, items.get(i).getLanguage());
-//            intent.putExtra(EXT_CATEGORY, items.get(i).getCategory()[0]);
-//            intent.putExtra(EXT_PUBLISHED, items.get(i).getPublished());
-//
-//            mContext.startActivity(intent);
-//        });
+        readFullBtn.setOnClickListener(tempView ->{
+            Intent redirect = new Intent(Intent.ACTION_VIEW, Uri.parse(items.get(i).getUrl()));
+            mContext.startActivity(redirect.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        });
 
         return view;
 

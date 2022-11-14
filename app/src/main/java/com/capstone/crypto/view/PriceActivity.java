@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -60,8 +61,9 @@ public class PriceActivity  extends AppCompatActivity {
     private Button articleBtn;
     private ImageView imageView;
     private ProgressDialog dialog;
-    private Integer choosed = 1;
+    private Integer choosed = 2;
     private String name;
+    private Button readFullBtn;
 
     int i = 0;
     int j = 0;
@@ -88,6 +90,7 @@ public class PriceActivity  extends AppCompatActivity {
         imageView = findViewById(R.id.imageView2);
         listView = findViewById(R.id.listview);
         chart = findViewById(R.id.bar);
+
         dialog = new ProgressDialog(PriceActivity.this);
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.setMessage("Data being processed...");
@@ -99,7 +102,7 @@ public class PriceActivity  extends AppCompatActivity {
             listView.setVisibility(View.INVISIBLE);
             String crypto = cryptoTxt.getText().toString();
             name = crypto;
-            searchPrice(crypto, choosed);
+            searchRealPrice(crypto, choosed);
         });
         articleBtn.setOnClickListener(view -> {
             searchNews();
@@ -193,7 +196,7 @@ public class PriceActivity  extends AppCompatActivity {
                 dialog.show();
             }
         });
-        searchPrice(name, choosed);
+        searchRealPrice(name, choosed);
     }
 
 
@@ -229,7 +232,7 @@ public class PriceActivity  extends AppCompatActivity {
         chart.setVisibleXRangeMaximum(size / 2);
         chart.moveViewToX(data.getEntryCount());
     }*/
-    void addEntry() {
+    void addEntry(int numberOfChart) {
         LineData lineData = chart.getData();
         int size1 = cryptoCurrencies.size();
         int size2 = expectedPrices.size();
@@ -243,43 +246,44 @@ public class PriceActivity  extends AppCompatActivity {
             data1.add(new Entry(i, (float) cryptoCurrencies.get(i).getHigh()));
             i++;
         }
-        System.out.println("------");
-        ArrayList<Entry> data2 = new ArrayList<Entry>();
-        i = 0;
-        while (true) {
-            if (i == size2) {
-                i = 0;
-                break;
-            }
-            data2.add(new Entry(i, (float) expectedPrices.get(i).getPrice()));
-            i++;
-        }
-    //        ArrayList<Entry> entry = new ArrayList<>();
-    //        for(int j = 0 ; j < expectedPrices.size(); j++)
-    //            entry.add(new Entry(Float.parseFloat(expectedPrices.get(j).getTime().substring(2)), (float)expectedPrices.get(j).getHigh()));
-    //        LineDataSet Rset = createRedSet(new LineDataSet(entry, "Expected Price"));
-    //        data.addDataSet(Rset);
-
         LineDataSet dataset1 = new LineDataSet(data1, "actual");
         dataset1 = createBlueSet(dataset1);
         ArrayList<ILineDataSet> lines = new ArrayList<ILineDataSet>();
         lines.add(dataset1);
-        LineDataSet dataset2 = new LineDataSet(data2, "expected");
-        dataset2 = createRedSet(dataset2);
-        lines.add(dataset2);
+
+        System.out.println("------");
+        if(numberOfChart == 2) {
+            ArrayList<Entry> data2 = new ArrayList<Entry>();
+            i = size2 - 300;
+            for( ;i < size2; i++){
+                data2.add(new Entry(i, (float) expectedPrices.get(i).getPrice()));
+                i++;
+            }
+//            while (true) {
+//                if (i == size2) {
+//                    i = 0;
+//                    break;
+//                }
+//                data2.add(new Entry(i, (float) expectedPrices.get(i).getPrice()));
+//                i++;
+//            }
+            LineDataSet dataset2 = new LineDataSet(data2, "expected");
+            dataset2 = createRedSet(dataset2);
+            lines.add(dataset2);
+        }
         chart.setData(new LineData(lines));
         chart.setVisibleXRangeMaximum(size1 / 2);
         chart.moveViewToX(data1.size());
     }
 
-    void feedMultiple()
+    void feedMultiple(int numberOfChart)
     {
         if(thread != null)
             thread.interrupt();
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                addEntry();
+                addEntry(numberOfChart);
             }
         };
         thread = new Thread(new Runnable() {
@@ -300,7 +304,7 @@ public class PriceActivity  extends AppCompatActivity {
         return label;
     }
 
-    void drawLineChart()
+    void drawLineChart(int numberOfChart)
     {
         XAxis xAxis = chart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
@@ -313,7 +317,7 @@ public class PriceActivity  extends AppCompatActivity {
         rightAxis.setEnabled(false);
         LineData data = new LineData();
         chart.setData(data);
-        feedMultiple();
+        feedMultiple(numberOfChart);
     }
 
     private LineDataSet createBlueSet(LineDataSet set)
@@ -373,12 +377,17 @@ public class PriceActivity  extends AppCompatActivity {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 final String myResponse = response.body().string();
+                System.out.println(myResponse);
                 Gson gson = new GsonBuilder().create();
                 Type collectionType = new TypeToken<List<CryptoPrice>>(){}.getType();
                 cryptoCurrencies = (List<CryptoPrice>) new Gson()
                         .fromJson( myResponse , collectionType);
-                drawLineChart();
-                dialog.dismiss();
+                if(num == 2)
+                    searchPrice(name, num);
+                else {
+                    drawLineChart(1);
+                    dialog.dismiss();
+                }
             }
         });
 
@@ -414,7 +423,9 @@ public class PriceActivity  extends AppCompatActivity {
                         });
                     }
                     System.out.println("zz" + expectedPrices.size());
-                    searchRealPrice(name, num);
+                    drawLineChart(2);
+                    dialog.dismiss();
+//                    searchRealPrice(name, num);
                 }catch (JsonSyntaxException e)
                 {
                     PriceActivity.this.runOnUiThread(new Runnable() {

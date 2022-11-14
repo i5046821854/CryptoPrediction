@@ -33,7 +33,7 @@ public class ChartMaker extends MarkerView {
 
     @Override
     public MPPointF getOffset() {
-        return new MPPointF(-(getWidth() / 2), -getHeight());
+        return new MPPointF(-(getWidth() / 2), -getHeight() + 150);
     }
 
 }
