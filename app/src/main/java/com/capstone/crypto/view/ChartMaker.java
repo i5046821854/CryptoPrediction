@@ -4,6 +4,7 @@ import android.content.Context;
 import android.widget.TextView;
 
 import com.capstone.crypto.R;
+import com.capstone.crypto.view.views.PriceActivity;
 import com.github.mikephil.charting.components.MarkerView;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.highlight.Highlight;
@@ -37,3 +38,5 @@ public class ChartMaker extends MarkerView {
     }
 
 }
+
+

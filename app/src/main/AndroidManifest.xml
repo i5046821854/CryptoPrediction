@@ -16,14 +16,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Crypto"
         tools:targetApi="31">
-        <activity android:name=".view.MainActivity"
+        <activity android:name=".view.views.MainActivity"
             android:exported="true" android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".view.PriceActivity" android:windowSoftInputMode="adjustPan"></activity>
+        <activity android:name=".view.views.PriceActivity" android:windowSoftInputMode="adjustPan"></activity>
+        <activity android:name=".view.views.LoginActivity" android:windowSoftInputMode="adjustPan"></activity>
+        <activity android:name=".view.views.MypageActicity" android:windowSoftInputMode="adjustPan"></activity>
     </application>
 
 </manifest>

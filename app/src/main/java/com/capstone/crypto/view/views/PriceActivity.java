@@ -1,10 +1,9 @@
-package com.capstone.crypto.view;
+package com.capstone.crypto.view.views;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -18,15 +17,18 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.capstone.crypto.R;
+import com.capstone.crypto.view.ChartMaker;
+import com.capstone.crypto.view.News;
+import com.capstone.crypto.view.NewsListViewAdapter;
+import com.capstone.crypto.view.ResponseModel;
+import com.capstone.crypto.view.model.CryptoPrice;
+import com.capstone.crypto.view.model.ExpectedPrice;
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.gson.Gson;
@@ -60,6 +62,7 @@ public class PriceActivity  extends AppCompatActivity {
     private Thread thread;
     private Button articleBtn;
     private ImageView imageView;
+    private ImageView myPageView;
     private ProgressDialog dialog;
     private Integer choosed = 2;
     private String name;
@@ -89,6 +92,7 @@ public class PriceActivity  extends AppCompatActivity {
         cryptoTxt = findViewById(R.id.searchBox);
         imageView = findViewById(R.id.imageView2);
         listView = findViewById(R.id.listview);
+        myPageView = findViewById(R.id.myPageBtn);
         chart = findViewById(R.id.bar);
 
         dialog = new ProgressDialog(PriceActivity.this);
@@ -106,6 +110,11 @@ public class PriceActivity  extends AppCompatActivity {
         });
         articleBtn.setOnClickListener(view -> {
             searchNews();
+        });
+        myPageView.setOnClickListener(view ->{
+            Intent intent = new Intent(PriceActivity.this, MypageActicity.class);
+            intent.putExtra("name", name);
+            startActivity(intent);
         });
     }
 
@@ -236,6 +245,8 @@ public class PriceActivity  extends AppCompatActivity {
         LineData lineData = chart.getData();
         int size1 = cryptoCurrencies.size();
         int size2 = expectedPrices.size();
+        System.out.println(size1);
+        System.out.println(size2);
         ArrayList<Entry> data1 = new ArrayList<Entry>();
         i = 0;
         while (true) {
@@ -372,7 +383,8 @@ public class PriceActivity  extends AppCompatActivity {
                     public void run() {
                         Toast.makeText(PriceActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
                     }
-                });                }
+                });
+            }
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
@@ -448,5 +460,12 @@ public class PriceActivity  extends AppCompatActivity {
                 });                }
 
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(PriceActivity.this, MainActivity.class);
+        startActivity(intent);
     }
 }

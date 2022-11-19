@@ -1,4 +1,4 @@
-package com.capstone.crypto.view;
+package com.capstone.crypto.view.model;
 
 public class CryptoPrice {
     int priceId;

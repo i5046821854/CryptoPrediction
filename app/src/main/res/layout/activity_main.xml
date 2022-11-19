@@ -11,10 +11,10 @@
         android:id="@+id/titleTxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="125dp"
+        android:layout_marginTop="95dp"
+        android:fontFamily="serif"
         android:singleLine="false"
         android:text="CryptoCurrency \nPrediction Service"
-        android:fontFamily="serif"
         android:textColor="#131313"
         android:textSize="30sp"
         android:textStyle="bold"
@@ -23,36 +23,33 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <EditText
+    <TextView
         android:id="@+id/cryptoNameTxt"
-        android:layout_width="275dp"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="Enter the name of Cryptocurrency"
+        android:hint="Sign in with another account"
         android:inputType="textPersonName"
+        android:linksClickable="true"
         android:minHeight="48dp"
-        android:textSize="16sp"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.144"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/titleTxt"
-        app:layout_constraintVertical_bias="0.342" />
+        app:layout_constraintTop_toBottomOf="@+id/searchBtn"
+        app:layout_constraintVertical_bias="0.538" />
 
     <Button
         android:id="@+id/searchBtn"
-        android:layout_width="63dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
         android:fontFamily="serif"
-        android:textSize="20sp"
-        app:icon="@android:drawable/ic_menu_search"
-        app:layout_constraintBottom_toBottomOf="@+id/cryptoNameTxt"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/cryptoNameTxt"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.591"
-        app:layout_constraintStart_toEndOf="@+id/cryptoNameTxt"
-        app:layout_constraintTop_toTopOf="@+id/cryptoNameTxt" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView3"
+        app:layout_constraintVertical_bias="0.0" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline2"
@@ -64,5 +61,16 @@
         app:layout_constraintGuide_percent="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/lee"
+        app:layout_constraintBottom_toTopOf="@+id/searchBtn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/titleTxt"
+        app:layout_constraintVertical_bias="0.35000002" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
