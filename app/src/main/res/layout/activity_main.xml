@@ -44,6 +44,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="serif"
+        android:onClick="search"
         android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/cryptoNameTxt"
         app:layout_constraintEnd_toEndOf="parent"
@@ -66,11 +67,12 @@
         android:id="@+id/imageView3"
         android:layout_width="150dp"
         android:layout_height="150dp"
+        android:onClick="search"
         android:src="@drawable/lee"
         app:layout_constraintBottom_toTopOf="@+id/searchBtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/titleTxt"
-        app:layout_constraintVertical_bias="0.35000002" />
+        app:layout_constraintVertical_bias="0.43" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -26,6 +26,7 @@
         <activity android:name=".view.views.PriceActivity" android:windowSoftInputMode="adjustPan"></activity>
         <activity android:name=".view.views.LoginActivity" android:windowSoftInputMode="adjustPan"></activity>
         <activity android:name=".view.views.MypageActicity" android:windowSoftInputMode="adjustPan"></activity>
+        <activity android:name=".view.views.RegisterActivity" android:windowSoftInputMode="adjustPan"></activity>
     </application>
 
 </manifest>

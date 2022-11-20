@@ -37,7 +37,7 @@
         app:layout_constraintVertical_bias="0.483" />
 
     <EditText
-        android:id="@+id/nicknameEditTxt"
+        android:id="@+id/idRegTxt"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="40dp"
@@ -84,6 +84,6 @@
         android:textColor="#131313"
         android:textSize="22sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/nicknameEditTxt" />
+        app:layout_constraintTop_toBottomOf="@+id/idRegTxt" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

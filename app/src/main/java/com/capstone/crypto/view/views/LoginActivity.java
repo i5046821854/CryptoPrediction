@@ -35,6 +35,10 @@ public class LoginActivity extends AppCompatActivity {
         helper = new DBHelper(LoginActivity.this, "newdb.db", null, 1);
         db = helper.getReadableDatabase();
 
+        signUpBtn.setOnClickListener(view -> {
+            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+            startActivity(intent);
+        });
         loginBtn.setOnClickListener(view -> {
             id = idTxt.getText().toString();
             pwd = pwdTxt.getText().toString();

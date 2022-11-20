@@ -35,7 +35,7 @@ public class MypageActicity extends AppCompatActivity {
         preferenceTxt = ogTxt;
         chooseBtn = (Button) findViewById(R.id.jobBtn);
         confirmBtn = (Button) findViewById(R.id.regBtn);
-        nicknameEdit = (EditText) findViewById(R.id.nicknameEditTxt);
+        nicknameEdit = (EditText) findViewById(R.id.idRegTxt);
         DBHelper helper;
         SQLiteDatabase db;
         helper = new DBHelper(MypageActicity.this, "newdb.db", null, 1);
