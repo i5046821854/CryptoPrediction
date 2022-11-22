@@ -4,6 +4,7 @@
     package="com.capstone.crypto">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -27,6 +28,7 @@
         <activity android:name=".view.views.LoginActivity" android:windowSoftInputMode="adjustPan"></activity>
         <activity android:name=".view.views.MypageActicity" android:windowSoftInputMode="adjustPan"></activity>
         <activity android:name=".view.views.RegisterActivity" android:windowSoftInputMode="adjustPan"></activity>
+        <activity android:name=".view.views.MenuActivity" android:windowSoftInputMode="adjustPan"></activity>
     </application>
 
 </manifest>

@@ -58,7 +58,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void search(View v){
         String crypto = cryptoTxt.getText().toString();
-        Intent intent = new Intent(MainActivity.this, PriceActivity.class);
+//        Intent intent = new Intent(MainActivity.this, PriceActivity.class);
+        Intent intent = new Intent(MainActivity.this, MenuActivity.class);
         crypto = (preference == 1? "etherium" : "bitcoin");
         intent.putExtra("name", crypto);
         System.out.println(crypto);

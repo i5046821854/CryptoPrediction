@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.capstone.crypto.R;
+import com.capstone.crypto.view.model.News;
 
 import java.util.ArrayList;
 

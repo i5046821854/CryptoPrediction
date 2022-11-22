@@ -1,28 +1,35 @@
-package com.capstone.crypto.view.views;
+package com.capstone.crypto.view.fragments;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
+
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.capstone.crypto.R;
-import com.capstone.crypto.view.utils.ChartMaker;
-import com.capstone.crypto.view.model.News;
 import com.capstone.crypto.view.NewsListViewAdapter;
 import com.capstone.crypto.view.ResponseModel;
 import com.capstone.crypto.view.model.CryptoPrice;
 import com.capstone.crypto.view.model.ExpectedPrice;
+import com.capstone.crypto.view.model.News;
+import com.capstone.crypto.view.utils.ChartMaker;
+import com.capstone.crypto.view.views.MainActivity;
+import com.capstone.crypto.view.views.MypageActicity;
+import com.capstone.crypto.view.views.PriceActivity;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -52,7 +59,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class PriceActivity  extends AppCompatActivity {
+
+public class HomeFragment extends Fragment {
 
     private EditText cryptoTxt;
     private Button searchBtn;
@@ -74,7 +82,7 @@ public class PriceActivity  extends AppCompatActivity {
     public static List<ExpectedPrice> expectedPrices;
     private ArrayList<News> newsList;
     private ResponseModel responseModel;
-
+    Context context;
     public List<CryptoPrice> getCryptoCurrencies() {
         return cryptoCurrencies;
     }
@@ -83,24 +91,27 @@ public class PriceActivity  extends AppCompatActivity {
         return expectedPrices;
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_price);
-        articleBtn = findViewById(R.id.articleBtn);
-        searchBtn = findViewById(R.id.searchBtn2);
-        cryptoTxt = findViewById(R.id.searchBox);
-        imageView = findViewById(R.id.imageView2);
-        listView = findViewById(R.id.listview);
-        myPageView = findViewById(R.id.myPageBtn);
-        chart = findViewById(R.id.bar);
 
-        dialog = new ProgressDialog(PriceActivity.this);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        context = container.getContext();
+        articleBtn = view.findViewById(R.id.articleBtn);
+        searchBtn = view.findViewById(R.id.searchBtn2);
+        cryptoTxt = view.findViewById(R.id.searchBox);
+        imageView = view.findViewById(R.id.imageView2);
+        listView = view.findViewById(R.id.listview);
+        myPageView = view.findViewById(R.id.myPageBtn);
+        chart = view.findViewById(R.id.bar);
+
+        dialog = new ProgressDialog(context);
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.setMessage("Data being processed...");
 
         initView();
-        searchBtn.setOnClickListener(view -> {
+        searchBtn.setOnClickListener(tempView -> {
             articleBtn.setVisibility(View.VISIBLE);
             newsList = new ArrayList<>();
             listView.setVisibility(View.INVISIBLE);
@@ -108,20 +119,21 @@ public class PriceActivity  extends AppCompatActivity {
             name = crypto;
             searchRealPrice(crypto, choosed);
         });
-        articleBtn.setOnClickListener(view -> {
+        articleBtn.setOnClickListener(tempView -> {
             searchNews();
         });
-        myPageView.setOnClickListener(view ->{
-            Intent intent = new Intent(PriceActivity.this, MypageActicity.class);
+        myPageView.setOnClickListener(tempView ->{
+            Intent intent = new Intent(context, MypageActicity.class);
             intent.putExtra("name", name);
             startActivity(intent);
         });
+        return view;
     }
 
     void searchNews()
     {
         System.out.println("ㅎㅎㅎ");
-        PriceActivity.this.runOnUiThread(new Runnable() {
+        getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 System.out.println("ㅋㅋㅋ");
@@ -143,8 +155,8 @@ public class PriceActivity  extends AppCompatActivity {
                 newsList = gson.fromJson(myResponse, ResponseModel.class).getNews();
                 for(News n : newsList)
                     System.out.println(n.getTitle());
-                NewsListViewAdapter newsListViewAdapter = new NewsListViewAdapter(getApplicationContext(), newsList);
-                PriceActivity.this.runOnUiThread(new Runnable() {
+                NewsListViewAdapter newsListViewAdapter = new NewsListViewAdapter(context, newsList);
+                getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         listView.setAdapter(newsListViewAdapter);
@@ -164,11 +176,10 @@ public class PriceActivity  extends AppCompatActivity {
     }
     void initView()
     {
-        ChartMaker marker = new ChartMaker(this,R.layout.chart_maker);
+        ChartMaker marker = new ChartMaker(context,R.layout.chart_maker);
         marker.setChartView(chart);
         chart.setMarker(marker);
-        Intent intent = getIntent();
-        name = intent.getStringExtra("name");
+        name = this.getArguments().getString("preference");
         cryptoTxt.setText(name);
         imageView.setOnClickListener(new View.OnClickListener() {
             int tempChoosed = choosed;
@@ -176,7 +187,7 @@ public class PriceActivity  extends AppCompatActivity {
             public void onClick(View view) {
                 final String[] items = new String[]{"HOUR", "DAY", "WEEK", "MONTH"};
                 final Integer[] mappedItems = new Integer[]{1,2,3,4};
-                AlertDialog.Builder dialog = new AlertDialog.Builder(PriceActivity.this);
+                AlertDialog.Builder dialog = new AlertDialog.Builder(context);
                 dialog.setTitle("Choose Time Period")
                         .setSingleChoiceItems(items
                                 , -1
@@ -192,13 +203,13 @@ public class PriceActivity  extends AppCompatActivity {
                                 if(choosed != tempChoosed){
                                     choosed = tempChoosed;
                                     searchRealPrice(name, choosed);
-                                    Toast.makeText(PriceActivity.this, "COMPLETE!", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(context, "COMPLETE!", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         }).setNeutralButton("취소", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                Toast.makeText(PriceActivity.this, "취소되었습니다", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, "취소되었습니다", Toast.LENGTH_SHORT).show();
                             }
                         });
                 dialog.create();
@@ -209,38 +220,6 @@ public class PriceActivity  extends AppCompatActivity {
     }
 
 
-
-/*    void addEntry() {
-        int size = cryptoCurrencies.size();
-//        int size2 = expectedPrices.size();
-        LineData data = chart.getData();
-        LineDataSet set = (LineDataSet) data.getDataSetByIndex(0);
-        if (set == null) {
-            set = createBlueSet();
-            data.addDataSet(set);
-        }
-        i = 0;
-        while (true) {
-            if (i == size) {
-                i = 0;
-                break;
-            }
-            data.addEntry(new Entry(i, (float) cryptoCurrencies.get(i).getHigh()), 0);
-            System.out.println(cryptoCurrencies.get(i).getHigh()+cryptoCurrencies.get(i).getTime());
-            i++;
-        }
-        System.out.println("------");
-//        ArrayList<Entry> entry = new ArrayList<>();
-//        for(int j = 0 ; j < expectedPrices.size(); j++)
-//            entry.add(new Entry(Float.parseFloat(expectedPrices.get(j).getTime().substring(2)), (float)expectedPrices.get(j).getHigh()));
-//        LineDataSet Rset = createRedSet(new LineDataSet(entry, "Expected Price"));
-//        data.addDataSet(Rset);
-
-        data.notifyDataChanged();
-        chart.notifyDataSetChanged();
-        chart.setVisibleXRangeMaximum(size / 2);
-        chart.moveViewToX(data.getEntryCount());
-    }*/
     void addEntry(int numberOfChart) {
         LineData lineData = chart.getData();
         int size1 = cryptoCurrencies.size();
@@ -270,14 +249,6 @@ public class PriceActivity  extends AppCompatActivity {
                 data2.add(new Entry(i + (size1- size2), (float) expectedPrices.get(i).getPrice()));
                 i++;
             }
-//            while (true) {
-//                if (i == size2) {
-//                    i = 0;
-//                    break;
-//                }
-//                data2.add(new Entry(i, (float) expectedPrices.get(i).getPrice()));
-//                i++;
-//            }
             LineDataSet dataset2 = new LineDataSet(data2, "expected");
             dataset2 = createRedSet(dataset2);
             lines.add(dataset2);
@@ -300,7 +271,7 @@ public class PriceActivity  extends AppCompatActivity {
         thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                runOnUiThread(runnable);
+                getActivity().runOnUiThread(runnable);
             }
         });
         thread.start();
@@ -359,7 +330,7 @@ public class PriceActivity  extends AppCompatActivity {
     }
     void searchRealPrice(String name, int num)
     {
-        PriceActivity.this.runOnUiThread(new Runnable() {
+        getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 dialog.show();
@@ -378,10 +349,10 @@ public class PriceActivity  extends AppCompatActivity {
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 System.out.println(e.toString());
 
-                PriceActivity.this.runOnUiThread(new Runnable() {
+                getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(PriceActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -427,10 +398,10 @@ public class PriceActivity  extends AppCompatActivity {
                             .fromJson( myResponse , collectionType);
                     if(expectedPrices.size() == 0)
                     {
-                        PriceActivity.this.runOnUiThread(new Runnable() {
+                        getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(PriceActivity.this, "해당하는 가상화폐가 존재하지 않습니다", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, "해당하는 가상화폐가 존재하지 않습니다", Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
@@ -440,10 +411,10 @@ public class PriceActivity  extends AppCompatActivity {
 //                    searchRealPrice(name, num);
                 }catch (JsonSyntaxException e)
                 {
-                    PriceActivity.this.runOnUiThread(new Runnable() {
+                    getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(PriceActivity.this, "Invalid Name of the Cryptocurrency", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "Invalid Name of the Cryptocurrency", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -452,20 +423,14 @@ public class PriceActivity  extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 System.out.println(e.toString());
-                PriceActivity.this.runOnUiThread(new Runnable() {
+                getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(PriceActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
                     }
                 });                }
 
         });
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        Intent intent = new Intent(PriceActivity.this, MainActivity.class);
-        startActivity(intent);
-    }
 }
