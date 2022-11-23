@@ -20,6 +20,7 @@ public class MypageActicity extends AppCompatActivity {
 
     Button chooseBtn;
     Button confirmBtn;
+    Button imageChooseBtn;
     EditText nicknameEdit;
     String nickname;
     Integer preference;
@@ -33,6 +34,7 @@ public class MypageActicity extends AppCompatActivity {
         Intent intent = getIntent();
         ogTxt = intent.getStringExtra("name");
         preferenceTxt = ogTxt;
+        imageChooseBtn = (Button) findViewById(R.id.imageBtn);
         chooseBtn = (Button) findViewById(R.id.jobBtn);
         confirmBtn = (Button) findViewById(R.id.regBtn);
         nicknameEdit = (EditText) findViewById(R.id.idRegTxt);
@@ -69,6 +71,40 @@ public class MypageActicity extends AppCompatActivity {
                                 if(preference != -1)
                                     preferenceTxt = (preference == 1 ? "etherium": "bitcoin");
                                     chooseBtn.setText("You have Chosen :" + preferenceTxt);
+                            }
+                        }).setNeutralButton("취소", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Toast.makeText(MypageActicity.this, "취소되었습니다", Toast.LENGTH_SHORT).show();
+                                preference = -1;
+                                chooseBtn.setText("Choose CryptoCurrency");
+                            }
+                        });
+                dialog.create();
+                dialog.show();
+            }
+        });
+        imageChooseBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final String[] items = new String[]{"Etherium", "bitcoin"};
+                AlertDialog.Builder dialog = new AlertDialog.Builder(MypageActicity.this);
+                dialog.setTitle("Choose Your Preferred CryptoCurrency")
+                        .setSingleChoiceItems(items
+                                , preference-1
+                                , new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        preference = i+1;
+                                    }
+                                })
+                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Toast.makeText(MypageActicity.this, "관심 분야가 선택되었습니다", Toast.LENGTH_SHORT).show();
+                                if(preference != -1)
+                                    preferenceTxt = (preference == 1 ? "etherium": "bitcoin");
+                                chooseBtn.setText("You have Chosen :" + preferenceTxt);
                             }
                         }).setNeutralButton("취소", new DialogInterface.OnClickListener() {
                             @Override

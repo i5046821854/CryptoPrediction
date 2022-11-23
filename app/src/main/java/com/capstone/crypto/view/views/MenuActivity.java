@@ -26,6 +26,7 @@ public class MenuActivity extends AppCompatActivity {
     private String preference;
     private String userId;
     private Bundle bundle;
+    private int img;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,9 +34,13 @@ public class MenuActivity extends AppCompatActivity {
         Intent intent = getIntent();
         preference = intent.getStringExtra("name");
         userId = intent.getStringExtra("id");
-        Bundle bundle= new Bundle();
+        img = intent.getIntExtra("img", 1);
+        System.out.println(img);
+        System.out.println("userID : " + userId);
+        bundle= new Bundle();
         bundle.putString("preference", preference);
         bundle.putString("id", userId);
+        bundle.putInt("img", img);
         homeFragment.setArguments(bundle);
         fragmentManager.beginTransaction().replace(R.id.menu_frame_layout, homeFragment).commitAllowingStateLoss();
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_menu);
@@ -72,8 +77,9 @@ public class MenuActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void changeFrag(int idx ,Bundle bundle){
+    public void changeFrag(int idx ,Bundle newBundle){
         if(idx == 1){ //to home
+            bundle = newBundle;
             homeFragment.setArguments(bundle);
             System.out.println(bundle.getString("preference"));
             getSupportFragmentManager().beginTransaction().replace(R.id.menu_frame_layout, homeFragment).commitAllowingStateLoss();

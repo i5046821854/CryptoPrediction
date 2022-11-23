@@ -25,7 +25,6 @@
         android:id="@+id/regBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
         android:fontFamily="serif"
         android:text="Confirm"
         android:textSize="17sp"
@@ -33,7 +32,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.491"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/jobBtn"
+        app:layout_constraintTop_toBottomOf="@+id/imageBtn"
         app:layout_constraintVertical_bias="0.483" />
 
     <EditText
@@ -85,5 +84,29 @@
         android:textSize="22sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/idRegTxt" />
+
+    <TextView
+        android:id="@+id/imageTxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="30dp"
+        android:fontFamily="serif"
+        android:text="Profile Picture"
+        android:textColor="#131313"
+        android:textSize="22sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/jobBtn" />
+
+    <Button
+        android:id="@+id/imageBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:fontFamily="serif"
+        android:text="Choose Your Profile Pic!"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="@+id/imageTxt"
+        app:layout_constraintTop_toBottomOf="@+id/imageTxt" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

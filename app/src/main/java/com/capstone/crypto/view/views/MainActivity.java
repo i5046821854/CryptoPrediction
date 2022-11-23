@@ -3,6 +3,7 @@ package com.capstone.crypto.view.views;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -24,13 +25,13 @@ public class MainActivity extends AppCompatActivity {
     private TextView cryptoTxt;
     private Button searchBtn;
     private ImageView imageView;
-
+    private Integer imgArr[] = {R.drawable.lee, R.drawable.cr, R.drawable.alang, R.drawable.cha};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Intent getIntent = getIntent();
-        id = getIntent.getStringExtra("name");
+        id = getIntent.getStringExtra("id");
         id = (id == null ? "leeyoungshin" : id);
         System.out.println(id);
         cryptoTxt = (TextView) findViewById(R.id.cryptoNameTxt);
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
             image = Integer.parseInt(cursor.getString(4));
             preference = Integer.parseInt(cursor.getString(5));
         }
+        imageView.setImageResource(imgArr[image]);
         searchBtn.setText("Start With " + nickname);
         cryptoTxt.setOnClickListener(view ->{
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
@@ -63,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
         crypto = (preference == 1? "etherium" : "bitcoin");
         intent.putExtra("name", crypto);
         intent.putExtra("id", id);
+        intent.putExtra("img", image);
         System.out.println(crypto);
         startActivity(intent);
     }

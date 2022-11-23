@@ -1,10 +1,12 @@
 package com.capstone.crypto.view.fragments;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.media.Image;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AlertDialog;
@@ -15,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.capstone.crypto.R;
@@ -28,9 +31,12 @@ public class MypageFragment extends Fragment {
 
     Button chooseBtn;
     Button confirmBtn;
+    Button imageChooseBtn;
     EditText nicknameEdit;
     String nickname;
     Integer preference;
+
+    Integer imgIdx;
     String preferenceTxt;
     String ogTxt;
     String[] items = new String[]{"Etherium", "bitcoin"};
@@ -44,9 +50,11 @@ public class MypageFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_mypage, container, false);
         context = container.getContext();
         preferenceTxt = ogTxt;
+        imageChooseBtn = (Button) view.findViewById(R.id.imageBtn);
         chooseBtn = (Button) view.findViewById(R.id.jobBtn);
         confirmBtn = (Button) view.findViewById(R.id.regBtn);
         nicknameEdit = (EditText) view.findViewById(R.id.idRegTxt);
+
         userId = getArguments().getString("id");
         DBHelper helper;
         SQLiteDatabase db;
@@ -56,6 +64,7 @@ public class MypageFragment extends Fragment {
         Cursor cursor = db.rawQuery("SELECT * FROM USERS WHERE username = '" + userId + "'", null);
         while(cursor.moveToNext()){
             nickname = cursor.getString(3);
+            imgIdx = Integer.parseInt(cursor.getString(4));
             preference = Integer.parseInt(cursor.getString(5));
             ogTxt = (preference == 1 ? "ehterium" : "bitcoin");
         }
@@ -95,19 +104,54 @@ public class MypageFragment extends Fragment {
                 dialog.show();
             }
         });
+
+        imageChooseBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Dialog dialog = new Dialog(context);
+                dialog.setContentView(R.layout.imgdialog_layout);
+                dialog.setTitle("custom dialog !!");
+                ImageView img1 = (ImageView) dialog.findViewById(R.id.image1);
+                ImageView img2 = (ImageView) dialog.findViewById(R.id.image2);
+                ImageView img3 = (ImageView) dialog.findViewById(R.id.image3);
+                ImageView img4 = (ImageView) dialog.findViewById(R.id.image4);
+                dialog.show();
+                img1.setOnClickListener(thisView -> {
+                    imgIdx = 0;
+                    imageChooseBtn.setText("lee.jpg");
+                    dialog.dismiss();
+                });
+                img2.setOnClickListener(thisView -> {
+                    imgIdx = 1;
+                    imageChooseBtn.setText("ronaldo.jpg");
+                    dialog.dismiss();
+                });
+                img3.setOnClickListener(thisView -> {
+                    imgIdx = 2;
+                    imageChooseBtn.setText("delon.jpg");
+                    dialog.dismiss();
+                });
+                img4.setOnClickListener(thisView -> {
+                    imgIdx = 3;
+                    imageChooseBtn.setText("cha.jpg");
+                    dialog.dismiss();
+                });
+            }
+
+        });
+
         confirmBtn.setOnClickListener(thisView -> {
             String newNickname = nicknameEdit.getText().toString();
-            String query = "UPDATE USERS SET nickname = '" + newNickname + "', preference = " + preference;
+            String query = "UPDATE USERS SET nickname = '" + newNickname + "', preference = " + preference + ", image = " + imgIdx;
             db.execSQL(query);
             Bundle bundle= new Bundle();
             bundle.putString("preference", preferenceTxt);
             System.out.println("changed into " + preferenceTxt);
             bundle.putString("id", userId);
+            bundle.putInt("img", imgIdx);
             ((MenuActivity)getActivity()).changeFrag(1, bundle);
-//            Intent confirmIntent = new Intent(context, MenuActivity.class);
-//            confirmIntent.putExtra("name", preferenceTxt);
-//            startActivity(confirmIntent);
         });
         return view;
     }
+
 }

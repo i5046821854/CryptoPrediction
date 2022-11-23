@@ -43,7 +43,6 @@ public class LoginActivity extends AppCompatActivity {
             id = idTxt.getText().toString();
             pwd = pwdTxt.getText().toString();
             Cursor cursor = db.rawQuery("SELECT * FROM USERS WHERE username = '" +id + "' AND password = '" + pwd + "'", null);
-            System.out.println(cursor.getCount());
             if(cursor.getCount() == 0)
             {
                 LoginActivity.this.runOnUiThread(new Runnable() {
@@ -56,6 +55,7 @@ public class LoginActivity extends AppCompatActivity {
                 });
             }else{
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                intent.putExtra("id" , id);
                 startActivity(intent);
             }
         });

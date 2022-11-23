@@ -125,7 +125,7 @@ public class RegisterActivity extends AppCompatActivity {
                 cv.put("preference", preference);
                 db.insertWithOnConflict("USERS", null, cv, SQLiteDatabase.CONFLICT_REPLACE);
                 Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
-                intent.putExtra("name", confirmed);
+                intent.putExtra("id", confirmed);
                 startActivity(intent);
             }
         });

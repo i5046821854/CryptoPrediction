@@ -13,7 +13,7 @@
         android:text="내용"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/my_image"
         app:layout_constraintTop_toTopOf="parent"></TextView>
 
     <TextView
@@ -31,9 +31,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:text="아이디"
+        android:text="나"
         app:layout_constraintBottom_toTopOf="@+id/my_content"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/my_image"
         app:layout_constraintStart_toStartOf="@+id/my_content" />
 
     <TextView
@@ -44,7 +44,7 @@
         android:text="내용"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/tv_image"
         app:layout_constraintTop_toTopOf="parent"></TextView>
 
     <TextView
@@ -64,5 +64,21 @@
         android:layout_marginBottom="8dp"
         android:text="아이디"
         app:layout_constraintBottom_toTopOf="@+id/tv_content"
-        app:layout_constraintStart_toStartOf="@+id/tv_content" />
+        app:layout_constraintStart_toEndOf="@+id/tv_image" />
+
+    <ImageView
+        android:id="@+id/tv_image"
+        android:layout_width="50dp"
+        android:layout_height="45dp"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_content"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <ImageView
+        android:id="@+id/my_image"
+        android:layout_width="50dp"
+        android:layout_height="45dp"
+        app:layout_constraintBottom_toBottomOf="@+id/my_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:srcCompat="@tools:sample/avatars" />
 </androidx.constraintlayout.widget.ConstraintLayout>

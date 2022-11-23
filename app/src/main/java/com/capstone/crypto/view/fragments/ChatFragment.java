@@ -16,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.capstone.crypto.R;
 import com.capstone.crypto.view.adapters.ChatListViewAdapter;
@@ -25,6 +26,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,28 +34,40 @@ import java.util.Date;
 
 public class ChatFragment extends Fragment {
 
-    ArrayList<Chat> chatList = new ArrayList<>();
+    ArrayList<Chat> chatList;
     ListView listView;
     Context context;
     Button sendBtn;
     EditText chatText;
     String userId;
+    TextView titleTxt;
     FirebaseDatabase database;
     DatabaseReference ref;
+    Integer image;
+    private String preference;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        chatList = new ArrayList<>();
+        System.out.println("화면 시작!!");
+        System.out.println(chatList.size());
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
+        titleTxt = view.findViewById(R.id.chatRoomTitle);
         listView = view.findViewById(R.id.chatListView);
         sendBtn = view.findViewById(R.id.sendBtn);
         chatText = view.findViewById(R.id.messageEditTxt);
         context = container.getContext();
         userId = getArguments().getString("id");
-        database = FirebaseDatabase.getInstance();
-        ref = database.getReference("message");
+        preference = getArguments().getString("preference");
+        image = getArguments().getInt("img");
+        titleTxt.setText("Chat Room for " + preference.toUpperCase());
 
-        ChatListViewAdapter adapter = new ChatListViewAdapter(context, R.layout.chat_listview, chatList, userId);
+        database = FirebaseDatabase.getInstance();
+        ref = database.getReference("message").child(preference);
+
+        ChatListViewAdapter adapter = new ChatListViewAdapter(context, R.layout.chat_listview, chatList, userId, preference);
         listView.setAdapter(adapter);
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
@@ -90,7 +104,7 @@ public class ChatFragment extends Fragment {
         sendBtn.setOnClickListener(thisView -> {
             Date today = new Date();
             SimpleDateFormat timeNow = new SimpleDateFormat("a K:mm");
-            ref.push().setValue(new Chat(0, userId, chatText.getText().toString(), timeNow.format(today)));
+            ref.push().setValue(new Chat(0, userId, chatText.getText().toString(), timeNow.format(today), preference, image));
 //            ref.push().setValue(new Chat(0, userId, chatText.getText().toString(), LocalDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG))));
             chatText.setText("");
         });
@@ -98,13 +112,16 @@ public class ChatFragment extends Fragment {
         ref.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                System.out.println("애디드!!");
                 Chat value = dataSnapshot.getValue(Chat.class); // 괄호 안 : 꺼낼 자료 형태
-                chatList.add(value);
-                adapter.notifyDataSetChanged();
+                if(value.getCrypto().equals(preference)){
+                    chatList.add(value);
+                    adapter.notifyDataSetChanged();
+                }
             }
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
+                System.out.println("child changed!");
             }
 
             @Override
@@ -123,6 +140,18 @@ public class ChatFragment extends Fragment {
             }
         });
 
+        ref.addValueEventListener(new ValueEventListener(){
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                System.out.println("value changed");
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         return view;
     }
 
