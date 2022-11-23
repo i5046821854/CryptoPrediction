@@ -3,7 +3,6 @@ package com.capstone.crypto.view.fragments;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 
@@ -21,15 +20,13 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.capstone.crypto.R;
-import com.capstone.crypto.view.NewsListViewAdapter;
+import com.capstone.crypto.view.adapters.NewsListViewAdapter;
 import com.capstone.crypto.view.ResponseModel;
 import com.capstone.crypto.view.model.CryptoPrice;
 import com.capstone.crypto.view.model.ExpectedPrice;
 import com.capstone.crypto.view.model.News;
 import com.capstone.crypto.view.utils.ChartMaker;
-import com.capstone.crypto.view.views.MainActivity;
-import com.capstone.crypto.view.views.MypageActicity;
-import com.capstone.crypto.view.views.PriceActivity;
+import com.capstone.crypto.view.views.MenuActivity;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -123,9 +120,9 @@ public class HomeFragment extends Fragment {
             searchNews();
         });
         myPageView.setOnClickListener(tempView ->{
-            Intent intent = new Intent(context, MypageActicity.class);
-            intent.putExtra("name", name);
-            startActivity(intent);
+            Bundle bundle= new Bundle();
+            bundle.putString("id", getArguments().getString("id"));
+            ((MenuActivity)getActivity()).changeFrag(2, bundle);
         });
         return view;
     }
@@ -179,7 +176,9 @@ public class HomeFragment extends Fragment {
         ChartMaker marker = new ChartMaker(context,R.layout.chart_maker);
         marker.setChartView(chart);
         chart.setMarker(marker);
-        name = this.getArguments().getString("preference");
+//        name = this.getArguments().getString("preference");
+        name = "bitcoin";
+        System.out.println(name);
         cryptoTxt.setText(name);
         imageView.setOnClickListener(new View.OnClickListener() {
             int tempChoosed = choosed;
@@ -216,7 +215,7 @@ public class HomeFragment extends Fragment {
                 dialog.show();
             }
         });
-        searchRealPrice(name, choosed);
+        //searchRealPrice(name, choosed);
     }
 
 

@@ -1,4 +1,4 @@
-package com.capstone.crypto.view;
+package com.capstone.crypto.view.adapters;
 
 import android.content.Context;
 import android.content.Intent;

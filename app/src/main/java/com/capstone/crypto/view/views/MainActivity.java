@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, MenuActivity.class);
         crypto = (preference == 1? "etherium" : "bitcoin");
         intent.putExtra("name", crypto);
+        intent.putExtra("id", id);
         System.out.println(crypto);
         startActivity(intent);
     }

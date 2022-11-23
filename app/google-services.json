@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "915396745377",
+    "project_id": "crypto-c8d76",
+    "storage_bucket": "crypto-c8d76.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:915396745377:android:98c4e6307f5420898e38e0",
+        "android_client_info": {
+          "package_name": "com.capstone.crypto"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "915396745377-gcn8ij1jspehvc41r6eqjgt4dcpdo7de.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHQnh7H51OKqM8PMjoXwbs-TPY9cGm91A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "915396745377-gcn8ij1jspehvc41r6eqjgt4dcpdo7de.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

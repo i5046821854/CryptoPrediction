@@ -19,7 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.capstone.crypto.R;
 import com.capstone.crypto.view.utils.ChartMaker;
 import com.capstone.crypto.view.model.News;
-import com.capstone.crypto.view.NewsListViewAdapter;
+import com.capstone.crypto.view.adapters.NewsListViewAdapter;
 import com.capstone.crypto.view.ResponseModel;
 import com.capstone.crypto.view.model.CryptoPrice;
 import com.capstone.crypto.view.model.ExpectedPrice;

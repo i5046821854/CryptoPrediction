@@ -5,20 +5,28 @@
         android:id = "@+id/home"
         android:enabled="true"
         android:icon="@drawable/ic_home"
-        android:title="홈"
+        android:title="home"
         app:showAsAction="always" />
 
     <item
-        android:id = "@+id/setting"
+        android:id = "@+id/prediction"
         android:enabled="true"
-        android:icon="@drawable/ic_settings"
-        android:title="설정"
+        android:icon="@drawable/graph"
+        android:title="prediction"
         app:showAsAction="always" />
+
+    <item
+        android:id = "@+id/chat"
+        android:enabled="true"
+        android:icon="@drawable/chat"
+        android:title="chat"
+        app:showAsAction="always" />
+
 
     <item
         android:id = "@+id/info"
         android:enabled="true"
-        android:icon="@drawable/ic_info"
-        android:title="정보"
+        android:icon="@drawable/user"
+        android:title="profile"
         app:showAsAction="always" />
 </menu>
