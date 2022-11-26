@@ -53,7 +53,7 @@ public class MenuActivity extends AppCompatActivity {
                         getSupportFragmentManager().beginTransaction().replace(R.id.menu_frame_layout, homeFragment).commitAllowingStateLoss();
                         return true;
                     case R.id.prediction:
-                        mypageFragment.setArguments(bundle);
+                        predictionFragment.setArguments(bundle);
                         getSupportFragmentManager().beginTransaction().replace(R.id.menu_frame_layout, predictionFragment).commitAllowingStateLoss();
                         return true;
                     case R.id.chat:

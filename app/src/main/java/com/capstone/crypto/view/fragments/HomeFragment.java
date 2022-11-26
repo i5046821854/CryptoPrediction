@@ -17,6 +17,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.capstone.crypto.R;
@@ -66,12 +68,11 @@ public class HomeFragment extends Fragment {
     private LineChart chart;
     private Thread thread;
     private Button articleBtn;
-    private ImageView imageView;
-    private ImageView myPageView;
     private ProgressDialog dialog;
     private Integer choosed = 2;
     private String name;
     private Button readFullBtn;
+    private RadioGroup radioGroup;
 
     int i = 0;
     int j = 0;
@@ -88,7 +89,6 @@ public class HomeFragment extends Fragment {
         return expectedPrices;
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -98,9 +98,9 @@ public class HomeFragment extends Fragment {
         articleBtn = view.findViewById(R.id.articleBtn);
         searchBtn = view.findViewById(R.id.searchBtn2);
         cryptoTxt = view.findViewById(R.id.searchBox);
-        imageView = view.findViewById(R.id.imageView2);
         listView = view.findViewById(R.id.listview);
-        myPageView = view.findViewById(R.id.myPageBtn);
+        radioGroup = view.findViewById(R.id.radioGroup);
+
         chart = view.findViewById(R.id.bar);
 
         dialog = new ProgressDialog(context);
@@ -119,10 +119,26 @@ public class HomeFragment extends Fragment {
         articleBtn.setOnClickListener(tempView -> {
             searchNews();
         });
-        myPageView.setOnClickListener(tempView ->{
-            Bundle bundle= new Bundle();
-            bundle.putString("id", getArguments().getString("id"));
-            ((MenuActivity)getActivity()).changeFrag(2, bundle);
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                int checkNum = 0;
+                switch(i){
+                    case R.id.radioButton:
+                        checkNum = 4;
+                        break;
+                    case R.id.radioButton2:
+                        checkNum = 3;
+                        break;
+                    case R.id.radioButton3:
+                        checkNum = 2;
+                        break;
+                    case R.id.radioButton4:
+                        checkNum = 1;
+                        break;
+                }
+                searchRealPrice(name, checkNum);
+            }
         });
         return view;
     }
@@ -180,42 +196,7 @@ public class HomeFragment extends Fragment {
         name = "bitcoin";
         System.out.println(name);
         cryptoTxt.setText(name);
-        imageView.setOnClickListener(new View.OnClickListener() {
-            int tempChoosed = choosed;
-            @Override
-            public void onClick(View view) {
-                final String[] items = new String[]{"HOUR", "DAY", "WEEK", "MONTH"};
-                final Integer[] mappedItems = new Integer[]{1,2,3,4};
-                AlertDialog.Builder dialog = new AlertDialog.Builder(context);
-                dialog.setTitle("Choose Time Period")
-                        .setSingleChoiceItems(items
-                                , -1
-                                , new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        tempChoosed = mappedItems[i];
-                                    }
-                                })
-                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                if(choosed != tempChoosed){
-                                    choosed = tempChoosed;
-                                    searchRealPrice(name, choosed);
-                                    Toast.makeText(context, "COMPLETE!", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        }).setNeutralButton("취소", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                Toast.makeText(context, "취소되었습니다", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                dialog.create();
-                dialog.show();
-            }
-        });
-        //searchRealPrice(name, choosed);
+        searchRealPrice(name, choosed);
     }
 
 

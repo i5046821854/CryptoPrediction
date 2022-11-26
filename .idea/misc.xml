@@ -6,15 +6,21 @@
         <entry key="..\:/Users/o5046/AndroidStudioProjects/Crypto/app/src/main/res/drawable/ic_home.xml" value="0.1" />
         <entry key="..\:/Users/o5046/AndroidStudioProjects/Crypto/app/src/main/res/drawable/ic_info.xml" value="0.1" />
         <entry key="..\:/Users/o5046/AndroidStudioProjects/Crypto/app/src/main/res/drawable/ic_launcher_background.xml" value="0.127" />
+        <entry key="..\:/Users/o5046/AndroidStudioProjects/Crypto/app/src/main/res/drawable/image_border.xml" value="0.1675" />
+        <entry key="..\:/Users/o5046/AndroidStudioProjects/Crypto/app/src/main/res/drawable/selector_radio_button.xml" value="0.1765" />
+        <entry key="..\:/Users/o5046/AndroidStudioProjects/Crypto/app/src/main/res/drawable/selector_radio_text.xml" value="0.1775" />
         <entry key="..\:/Users/o5046/AndroidStudioProjects/Crypto/app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="..\:/Users/o5046/AndroidStudioProjects/Crypto/app/src/main/res/layout/activity_menu.xml" value="0.16666666666666666" />
         <entry key="..\:/Users/o5046/AndroidStudioProjects/Crypto/app/src/main/res/layout/activity_price.xml" value="0.18931159420289856" />
+        <entry key="..\:/Users/o5046/AndroidStudioProjects/Crypto/app/src/main/res/layout/chartMaker_prediction.xml" value="0.1838768115942029" />
         <entry key="..\:/Users/o5046/AndroidStudioProjects/Crypto/app/src/main/res/layout/chart_maker.xml" value="0.4" />
         <entry key="..\:/Users/o5046/AndroidStudioProjects/Crypto/app/src/main/res/layout/chat_listview.xml" value="0.2259963768115942" />
+        <entry key="..\:/Users/o5046/AndroidStudioProjects/Crypto/app/src/main/res/layout/fragment_blank.xml" value="0.24947916666666667" />
         <entry key="..\:/Users/o5046/AndroidStudioProjects/Crypto/app/src/main/res/layout/fragment_chat.xml" value="0.264" />
         <entry key="..\:/Users/o5046/AndroidStudioProjects/Crypto/app/src/main/res/layout/fragment_home.xml" value="0.16666666666666666" />
         <entry key="..\:/Users/o5046/AndroidStudioProjects/Crypto/app/src/main/res/layout/fragment_mypage.xml" value="0.16666666666666666" />
         <entry key="..\:/Users/o5046/AndroidStudioProjects/Crypto/app/src/main/res/layout/fragment_prediction.xml" value="0.19791666666666666" />
+        <entry key="..\:/Users/o5046/AndroidStudioProjects/Crypto/app/src/main/res/layout/imgdialog_layout.xml" value="0.2" />
         <entry key="..\:/Users/o5046/AndroidStudioProjects/Crypto/app/src/main/res/layout/linechart.xml" value="0.109375" />
         <entry key="..\:/Users/o5046/AndroidStudioProjects/Crypto/app/src/main/res/layout/login_layout.xml" value="0.1859375" />
         <entry key="..\:/Users/o5046/AndroidStudioProjects/Crypto/app/src/main/res/layout/mypage.xml" value="0.17708333333333334" />
@@ -22,6 +28,7 @@
         <entry key="..\:/Users/o5046/AndroidStudioProjects/Crypto/app/src/main/res/layout/news_detail.xml" value="0.17708333333333334" />
         <entry key="..\:/Users/o5046/AndroidStudioProjects/Crypto/app/src/main/res/layout/news_list.xml" value="0.17708333333333334" />
         <entry key="..\:/Users/o5046/AndroidStudioProjects/Crypto/app/src/main/res/layout/news_listview.xml" value="0.17708333333333334" />
+        <entry key="..\:/Users/o5046/AndroidStudioProjects/Crypto/app/src/main/res/layout/radio_buttom.xml" value="0.16770833333333332" />
         <entry key="..\:/Users/o5046/AndroidStudioProjects/Crypto/app/src/main/res/layout/register_layout.xml" value="0.176" />
         <entry key="..\:/Users/o5046/AndroidStudioProjects/Crypto/app/src/main/res/menu/bottom_menu.xml" value="0.1" />
       </map>

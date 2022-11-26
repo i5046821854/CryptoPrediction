@@ -17,8 +17,8 @@ public class LoginActivity extends AppCompatActivity {
 
     EditText idTxt;
     EditText pwdTxt;
-    Button signUpBtn;
-    Button loginBtn;
+    Button signUpBtn; //회원가입 버튼
+    Button loginBtn; //로그인 버튼
     String id;
     String pwd;
 
