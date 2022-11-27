@@ -329,12 +329,12 @@ public class HomeFragment extends Fragment {
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 System.out.println(e.toString());
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+//                getActivity().runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
+//                    }
+//                });
             }
 
             @Override

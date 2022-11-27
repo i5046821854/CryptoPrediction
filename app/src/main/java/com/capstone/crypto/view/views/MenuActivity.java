@@ -27,6 +27,7 @@ public class MenuActivity extends AppCompatActivity {
     private String userId;
     private Bundle bundle;
     private int img;
+    private BottomNavigationView bottomNavigationView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,7 +44,7 @@ public class MenuActivity extends AppCompatActivity {
         bundle.putInt("img", img);
         homeFragment.setArguments(bundle);
         fragmentManager.beginTransaction().replace(R.id.menu_frame_layout, homeFragment).commitAllowingStateLoss();
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_menu);
+        bottomNavigationView = findViewById(R.id.bottom_menu);
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -79,15 +80,18 @@ public class MenuActivity extends AppCompatActivity {
 
     public void changeFrag(int idx ,Bundle newBundle){
         if(idx == 1){ //to home
+            bottomNavigationView.getMenu().getItem(0).setChecked(true);
             bundle = newBundle;
             homeFragment.setArguments(bundle);
             System.out.println(bundle.getString("preference"));
             getSupportFragmentManager().beginTransaction().replace(R.id.menu_frame_layout, homeFragment).commitAllowingStateLoss();
         }else if(idx == 2){
+            bottomNavigationView.getMenu().getItem(3).setChecked(true);
             mypageFragment.setArguments(bundle);
             getSupportFragmentManager().beginTransaction().replace(R.id.menu_frame_layout, mypageFragment).commitAllowingStateLoss();
         }else if(idx == 3){
-            mypageFragment.setArguments(bundle);
+            bottomNavigationView.getMenu().getItem(2).setChecked(true);
+            chatFragment.setArguments(bundle);
             getSupportFragmentManager().beginTransaction().replace(R.id.menu_frame_layout, chatFragment).commitAllowingStateLoss();
         }
     }

@@ -34,7 +34,8 @@ import java.util.Date;
 
 public class ChatFragment extends Fragment {
 
-    ArrayList<Chat> chatList;
+    public static ArrayList<Chat> chatList;
+    private static ChatListViewAdapter adapter;
     ListView listView;
     Context context;
     Button sendBtn;
@@ -45,6 +46,7 @@ public class ChatFragment extends Fragment {
     DatabaseReference ref;
     Integer image;
     private String preference;
+    ChildEventListener listener;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -65,9 +67,9 @@ public class ChatFragment extends Fragment {
         titleTxt.setText("Chat Room for " + preference.toUpperCase());
 
         database = FirebaseDatabase.getInstance();
-        ref = database.getReference("message").child(preference);
+        ref = database.getReference("message");
 
-        ChatListViewAdapter adapter = new ChatListViewAdapter(context, R.layout.chat_listview, chatList, userId, preference);
+        adapter = new ChatListViewAdapter(context, R.layout.chat_listview, chatList, userId, preference);
         listView.setAdapter(adapter);
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
@@ -104,16 +106,17 @@ public class ChatFragment extends Fragment {
         sendBtn.setOnClickListener(thisView -> {
             Date today = new Date();
             SimpleDateFormat timeNow = new SimpleDateFormat("a K:mm");
+            System.out.println("zzzz");
             ref.push().setValue(new Chat(0, userId, chatText.getText().toString(), timeNow.format(today), preference, image));
 //            ref.push().setValue(new Chat(0, userId, chatText.getText().toString(), LocalDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG))));
             chatText.setText("");
         });
-
-        ref.addChildEventListener(new ChildEventListener() {
+        listener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 System.out.println("애디드!!");
                 Chat value = dataSnapshot.getValue(Chat.class); // 괄호 안 : 꺼낼 자료 형태
+                System.out.println(value.getContent());
                 if(value.getCrypto().equals(preference)){
                     chatList.add(value);
                     adapter.notifyDataSetChanged();
@@ -138,21 +141,24 @@ public class ChatFragment extends Fragment {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        });
+        };
+        ref.addChildEventListener(listener);
 
-        ref.addValueEventListener(new ValueEventListener(){
-
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                System.out.println("value changed");
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
         return view;
+    }
+
+    public static void changeValue(String id, int img){
+        chatList.stream().filter(chat -> chat.getId().equals(id))
+                .forEach(chat -> chat.setImage(img));
+        adapter.notifyDataSetChanged();
+    }
+    
+
+    @Override
+    public void onPause() {
+        System.out.println("paused");
+        ref.removeEventListener(listener);
+        super.onPause();
     }
 
 }

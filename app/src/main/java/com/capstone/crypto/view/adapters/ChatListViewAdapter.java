@@ -1,6 +1,8 @@
 package com.capstone.crypto.view.adapters;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +12,8 @@ import android.widget.TextView;
 
 import com.capstone.crypto.R;
 import com.capstone.crypto.view.model.Chat;
+import com.capstone.crypto.view.utils.DBHelper;
+import com.capstone.crypto.view.utils.DBconnection;
 
 import java.util.ArrayList;
 
@@ -22,6 +26,9 @@ public class ChatListViewAdapter extends BaseAdapter {
     private String userId;
     private String preference;
     private Integer imgArr[] = {R.drawable.lee, R.drawable.cr, R.drawable.alang, R.drawable.cha};
+    private DBHelper helper;
+    private SQLiteDatabase db;
+    private Integer image = 0;
 
     public ChatListViewAdapter(Context context, int chat_listview, ArrayList<Chat> array, String userId, String preference) {
         this.context = context;
@@ -30,6 +37,9 @@ public class ChatListViewAdapter extends BaseAdapter {
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.userId = userId;
         this.preference = preference;
+        DBconnection dBconnection = new DBconnection(context);
+        this.helper = dBconnection.getHelper();
+        this.db = dBconnection.getDb();
     }
 
     @Override
@@ -53,6 +63,7 @@ public class ChatListViewAdapter extends BaseAdapter {
         if(convertView == null){
             convertView = inflater.inflate(layout, parent, false); //아이디를 가지고 view를 만든다
         }
+        String userId = chatData.get(position).getId();
         TextView tv_msg = (TextView)convertView.findViewById(R.id.tv_content);
         TextView tv_time = (TextView)convertView.findViewById(R.id.tv_time);
         TextView tv_name = (TextView)convertView.findViewById(R.id.tv_name);

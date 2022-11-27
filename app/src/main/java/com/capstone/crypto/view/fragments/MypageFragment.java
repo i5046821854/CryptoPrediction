@@ -3,12 +3,12 @@ package com.capstone.crypto.view.fragments;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.media.Image;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
@@ -21,14 +21,24 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.capstone.crypto.R;
+import com.capstone.crypto.view.model.Chat;
 import com.capstone.crypto.view.utils.DBHelper;
 import com.capstone.crypto.view.views.MenuActivity;
-import com.capstone.crypto.view.views.MypageActicity;
-import com.capstone.crypto.view.views.PriceActivity;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 
 
 public class MypageFragment extends Fragment {
 
+    public Boolean occupy;
     Button chooseBtn;
     Button confirmBtn;
     Button imageChooseBtn;
@@ -42,6 +52,7 @@ public class MypageFragment extends Fragment {
     String[] items = new String[]{"Etherium", "bitcoin"};
     Context context;
     String userId;
+    HashSet<String> keyList = new HashSet<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -49,7 +60,6 @@ public class MypageFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_mypage, container, false);
         context = container.getContext();
-        preferenceTxt = ogTxt;
         imageChooseBtn = (Button) view.findViewById(R.id.imageBtn);
         chooseBtn = (Button) view.findViewById(R.id.jobBtn);
         confirmBtn = (Button) view.findViewById(R.id.regBtn);
@@ -66,9 +76,9 @@ public class MypageFragment extends Fragment {
             nickname = cursor.getString(3);
             imgIdx = Integer.parseInt(cursor.getString(4));
             preference = Integer.parseInt(cursor.getString(5));
-            ogTxt = (preference == 1 ? "ehterium" : "bitcoin");
+            ogTxt = (preference == 1 ? "etherium" : "bitcoin");
         }
-
+        preferenceTxt = ogTxt;
         nicknameEdit.setText(nickname);
         chooseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,6 +114,24 @@ public class MypageFragment extends Fragment {
                 dialog.show();
             }
         });
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference("message");
+
+
+        ValueEventListener listener = new ValueEventListener(){
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                snapshot.getChildren().forEach( child-> keyList.add(child.getKey()));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+        ref.addListenerForSingleValueEvent(listener);
+        ref.removeEventListener(listener);
 
         imageChooseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -144,13 +172,19 @@ public class MypageFragment extends Fragment {
             String newNickname = nicknameEdit.getText().toString();
             String query = "UPDATE USERS SET nickname = '" + newNickname + "', preference = " + preference + ", image = " + imgIdx;
             db.execSQL(query);
-            Bundle bundle= new Bundle();
+            Bundle bundle = new Bundle();
             bundle.putString("preference", preferenceTxt);
             System.out.println("changed into " + preferenceTxt);
             bundle.putString("id", userId);
             bundle.putInt("img", imgIdx);
+            for(String key : keyList){
+                HashMap<String, Object> change = new HashMap<>();
+                change.put("image", imgIdx);
+                ref.child(key).updateChildren(change);
+            }
             ((MenuActivity)getActivity()).changeFrag(1, bundle);
         });
+
         return view;
     }
 
