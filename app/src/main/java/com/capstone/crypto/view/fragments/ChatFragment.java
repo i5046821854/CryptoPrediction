@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,12 +22,12 @@ import android.widget.TextView;
 import com.capstone.crypto.R;
 import com.capstone.crypto.view.adapters.ChatListViewAdapter;
 import com.capstone.crypto.view.model.Chat;
+import com.capstone.crypto.view.views.MenuActivity;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -45,6 +46,7 @@ public class ChatFragment extends Fragment {
     FirebaseDatabase database;
     DatabaseReference ref;
     Integer image;
+    String nickname;
     private String preference;
     ChildEventListener listener;
 
@@ -54,16 +56,18 @@ public class ChatFragment extends Fragment {
         // Inflate the layout for this fragment
         chatList = new ArrayList<>();
         System.out.println("화면 시작!!");
-        System.out.println(chatList.size());
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
         titleTxt = view.findViewById(R.id.chatRoomTitle);
         listView = view.findViewById(R.id.chatListView);
         sendBtn = view.findViewById(R.id.sendBtn);
         chatText = view.findViewById(R.id.messageEditTxt);
         context = container.getContext();
+        Bundle bundle = getArguments();
         userId = getArguments().getString("id");
         preference = getArguments().getString("preference");
         image = getArguments().getInt("img");
+        nickname = getArguments().getString("nickname");
+        System.out.println(userId);
         titleTxt.setText("Chat Room for " + preference.toUpperCase());
 
         database = FirebaseDatabase.getInstance();
@@ -107,7 +111,7 @@ public class ChatFragment extends Fragment {
             Date today = new Date();
             SimpleDateFormat timeNow = new SimpleDateFormat("a K:mm");
             System.out.println("zzzz");
-            ref.push().setValue(new Chat(0, userId, chatText.getText().toString(), timeNow.format(today), preference, image));
+            ref.push().setValue(new Chat(0, userId, nickname, chatText.getText().toString(), timeNow.format(today), preference, image));
 //            ref.push().setValue(new Chat(0, userId, chatText.getText().toString(), LocalDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG))));
             chatText.setText("");
         });
@@ -124,7 +128,8 @@ public class ChatFragment extends Fragment {
             }
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                System.out.println("child changed!");
+                System.out.println("@@@@@@@@@child changed!");
+                ((MenuActivity)getActivity()).changeFrag(3, bundle);
             }
 
             @Override
@@ -142,10 +147,17 @@ public class ChatFragment extends Fragment {
 
             }
         };
-        ref.addChildEventListener(listener);
 
+        ref.addChildEventListener(listener);
         return view;
     }
+
+    private void refresh() {
+        FragmentTransaction fm = getFragmentManager().beginTransaction();
+        fm.detach(this).commitAllowingStateLoss();
+        fm.attach(this).commitAllowingStateLoss();
+    }
+
 
     public static void changeValue(String id, int img){
         chatList.stream().filter(chat -> chat.getId().equals(id))

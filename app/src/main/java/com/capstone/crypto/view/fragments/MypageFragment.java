@@ -122,7 +122,12 @@ public class MypageFragment extends Fragment {
         ValueEventListener listener = new ValueEventListener(){
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                snapshot.getChildren().forEach( child-> keyList.add(child.getKey()));
+                snapshot.getChildren().forEach( child-> {
+                    Chat chat = child.getValue(Chat.class);
+                    System.out.println(chat.getId() + " +"  + userId);
+                    if(chat.getId().equals(userId))
+                        keyList.add(child.getKey());
+                });
             }
 
             @Override
@@ -177,9 +182,11 @@ public class MypageFragment extends Fragment {
             System.out.println("changed into " + preferenceTxt);
             bundle.putString("id", userId);
             bundle.putInt("img", imgIdx);
+            bundle.putString("nickname", newNickname);
             for(String key : keyList){
                 HashMap<String, Object> change = new HashMap<>();
                 change.put("image", imgIdx);
+                change.put("nickname", newNickname);
                 ref.child(key).updateChildren(change);
             }
             ((MenuActivity)getActivity()).changeFrag(1, bundle);

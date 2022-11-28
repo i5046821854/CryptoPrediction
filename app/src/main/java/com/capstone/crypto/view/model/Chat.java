@@ -5,6 +5,7 @@ public class Chat {
     private int imageId;
     private String crypto;
     private String id;
+    private String nickname;
     private String content;
     private String time;
     private Integer image;
@@ -13,9 +14,10 @@ public class Chat {
 
     }
 
-    public Chat(int imageId, String id, String content, String time, String crypto, Integer img) {
+    public Chat(int imageId, String id, String nickname, String content, String time, String crypto, Integer img) {
         this.imageId = imageId;
         this.id = id;
+        this.nickname = nickname;
         this.content = content;
         this.time = time;
         this.crypto = crypto;
@@ -68,5 +70,13 @@ public class Chat {
 
     public void setImage(Integer image) {
         this.image = image;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 }

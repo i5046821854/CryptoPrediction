@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
         crypto = (preference == 1? "etherium" : "bitcoin");
         intent.putExtra("name", crypto);
         intent.putExtra("id", id);
+        intent.putExtra("nickname", nickname);
         intent.putExtra("img", image);
         System.out.println(crypto);
         startActivity(intent);

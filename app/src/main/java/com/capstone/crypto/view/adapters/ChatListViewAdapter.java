@@ -63,7 +63,7 @@ public class ChatListViewAdapter extends BaseAdapter {
         if(convertView == null){
             convertView = inflater.inflate(layout, parent, false); //아이디를 가지고 view를 만든다
         }
-        String userId = chatData.get(position).getId();
+        String nickname = chatData.get(position).getNickname();
         TextView tv_msg = (TextView)convertView.findViewById(R.id.tv_content);
         TextView tv_time = (TextView)convertView.findViewById(R.id.tv_time);
         TextView tv_name = (TextView)convertView.findViewById(R.id.tv_name);
@@ -73,6 +73,7 @@ public class ChatListViewAdapter extends BaseAdapter {
         ImageView my_image = (ImageView)convertView.findViewById(R.id.my_image);
         ImageView tv_image = (ImageView)convertView.findViewById(R.id.tv_image);
 
+        System.out.println(chatData.get(position).getId() + " " + userId);
         if(chatData.get(position).getId().equals(userId)){
             tv_time.setVisibility(View.GONE);
             tv_name.setVisibility(View.GONE);
@@ -101,7 +102,7 @@ public class ChatListViewAdapter extends BaseAdapter {
 
             tv_time.setText(chatData.get(position).getTime());
             tv_msg.setText(chatData.get(position).getContent());
-            tv_name.setText(chatData.get(position).getId());
+            tv_name.setText(nickname);
             tv_image.setImageResource(imgArr[chatData.get(position).getImage()]);
         }
 

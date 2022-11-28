@@ -25,6 +25,7 @@ public class MenuActivity extends AppCompatActivity {
     private FragmentManager fragmentManager = getSupportFragmentManager();
     private String preference;
     private String userId;
+    private String nickname;
     private Bundle bundle;
     private int img;
     private BottomNavigationView bottomNavigationView;
@@ -35,6 +36,7 @@ public class MenuActivity extends AppCompatActivity {
         Intent intent = getIntent();
         preference = intent.getStringExtra("name");
         userId = intent.getStringExtra("id");
+        nickname = intent.getStringExtra("nickname");
         img = intent.getIntExtra("img", 1);
         System.out.println(img);
         System.out.println("userID : " + userId);
@@ -42,6 +44,7 @@ public class MenuActivity extends AppCompatActivity {
         bundle.putString("preference", preference);
         bundle.putString("id", userId);
         bundle.putInt("img", img);
+        bundle.putString("nickname", nickname);
         homeFragment.setArguments(bundle);
         fragmentManager.beginTransaction().replace(R.id.menu_frame_layout, homeFragment).commitAllowingStateLoss();
         bottomNavigationView = findViewById(R.id.bottom_menu);
@@ -92,6 +95,7 @@ public class MenuActivity extends AppCompatActivity {
         }else if(idx == 3){
             bottomNavigationView.getMenu().getItem(2).setChecked(true);
             chatFragment.setArguments(bundle);
+            System.out.println("called!");
             getSupportFragmentManager().beginTransaction().replace(R.id.menu_frame_layout, chatFragment).commitAllowingStateLoss();
         }
     }
