@@ -25,15 +25,16 @@ public class ChartMaker extends MarkerView {
     @Override
     public void refreshContent(Entry e, Highlight highlight) {
         float x = e.getX();
-        float realPrice = HomeFragment.cryptoCurrencies.get((int)x).getHigh();
-        float expectedPrice = HomeFragment.expectedPrices.get((int)x).getPrice();
-        tvContent.setText(""  + "Expected Price : " + Utils.formatNumber(expectedPrice, 0, true) + "\n" + "Actual Price : " + Utils.formatNumber( realPrice, 0, true));
+        float realPrice = HomeFragment.cryptoCurrencies.get((int)x).getClose();
+        String date = HomeFragment.cryptoCurrencies.get((int)x).getTime();
+        int len = date.length();
+        tvContent.setText("Date : " + date.substring(2,len)+ "\nPrice : " + Utils.formatNumber( realPrice, 0, true));
         super.refreshContent(e, highlight);
     }
 
     @Override
     public MPPointF getOffset() {
-        return new MPPointF(-(getWidth() / 2), -getHeight() + 150);
+        return new MPPointF(-(getWidth() / 2), -getHeight() + 120);
     }
 
 }

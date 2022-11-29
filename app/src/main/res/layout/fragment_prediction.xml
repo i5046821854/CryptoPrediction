@@ -69,7 +69,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="Expected Price is By Each Indicator"
+        android:text="Expected Price By Each Indicator"
         android:textColor="#494646"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -214,11 +214,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAlignment="center"
-        android:textSize="18sp"
+        android:textSize="14sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/guideline11"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchBox" />
+
+    <TextView
+        android:id="@+id/showArticleBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show Articles On This Day"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintEnd_toEndOf="@+id/resultTxt"
+        app:layout_constraintStart_toStartOf="@+id/resultTxt"
+        app:layout_constraintTop_toBottomOf="@+id/resultTxt" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

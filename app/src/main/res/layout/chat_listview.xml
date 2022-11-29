@@ -31,9 +31,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:text="나"
+        android:text="you"
         app:layout_constraintBottom_toTopOf="@+id/my_content"
-        app:layout_constraintEnd_toStartOf="@+id/my_image"
         app:layout_constraintStart_toStartOf="@+id/my_content" />
 
     <TextView

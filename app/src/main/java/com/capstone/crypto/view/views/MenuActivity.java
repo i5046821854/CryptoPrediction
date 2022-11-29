@@ -12,6 +12,7 @@ import com.capstone.crypto.view.fragments.ChatFragment;
 import com.capstone.crypto.view.fragments.HomeFragment;
 import com.capstone.crypto.view.fragments.MypageFragment;
 import com.capstone.crypto.R;
+import com.capstone.crypto.view.fragments.NewsFragment;
 import com.capstone.crypto.view.fragments.PredictionFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -22,6 +23,7 @@ public class MenuActivity extends AppCompatActivity {
     private MypageFragment mypageFragment = new MypageFragment();
     private ChatFragment chatFragment = new ChatFragment();
     private PredictionFragment predictionFragment = new PredictionFragment();
+    private NewsFragment newsFragment = new NewsFragment();
     private FragmentManager fragmentManager = getSupportFragmentManager();
     private String preference;
     private String userId;
@@ -68,6 +70,10 @@ public class MenuActivity extends AppCompatActivity {
                         mypageFragment.setArguments(bundle);
                         getSupportFragmentManager().beginTransaction().replace(R.id.menu_frame_layout, mypageFragment).commitAllowingStateLoss();
                         return true;
+                    case R.id.news:
+                        newsFragment.setArguments(bundle);
+                        getSupportFragmentManager().beginTransaction().replace(R.id.menu_frame_layout, newsFragment).commitAllowingStateLoss();
+                        return true;
                 }
                 return false;
             }
@@ -88,11 +94,17 @@ public class MenuActivity extends AppCompatActivity {
             homeFragment.setArguments(bundle);
             System.out.println(bundle.getString("preference"));
             getSupportFragmentManager().beginTransaction().replace(R.id.menu_frame_layout, homeFragment).commitAllowingStateLoss();
-        }else if(idx == 2){
-            bottomNavigationView.getMenu().getItem(3).setChecked(true);
+        }else if(idx == 2){  //to Mypage
+            bottomNavigationView.getMenu().getItem(4).setChecked(true);
             mypageFragment.setArguments(bundle);
             getSupportFragmentManager().beginTransaction().replace(R.id.menu_frame_layout, mypageFragment).commitAllowingStateLoss();
         }else if(idx == 3){
+            bottomNavigationView.getMenu().getItem(3).setChecked(true);
+            chatFragment.setArguments(bundle);
+            System.out.println("called!");
+            getSupportFragmentManager().beginTransaction().replace(R.id.menu_frame_layout, chatFragment).commitAllowingStateLoss();
+        }
+        else if(idx == 4){
             bottomNavigationView.getMenu().getItem(2).setChecked(true);
             chatFragment.setArguments(bundle);
             System.out.println("called!");
