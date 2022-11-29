@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.capstone.crypto.R;
@@ -46,6 +47,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -64,14 +66,17 @@ public class HomeFragment extends Fragment {
     private EditText cryptoTxt;
     private Button searchBtn;
     private String status;
-    private ListView listView;
     private LineChart chart;
     private Thread thread;
-    private Button articleBtn;
+    private TextView openTxt;
+    private TextView closeTxt;
+    private TextView lowTxt;
+    private TextView highTxt;
+    private TextView volumeTxt;
+    private CryptoPrice curPrice;
     private ProgressDialog dialog;
     private Integer choosed = 2;
     private String name;
-    private Button readFullBtn;
     private RadioGroup radioGroup;
 
     int i = 0;
@@ -95,12 +100,14 @@ public class HomeFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         context = container.getContext();
-        articleBtn = view.findViewById(R.id.articleBtn);
         searchBtn = view.findViewById(R.id.searchBtn2);
         cryptoTxt = view.findViewById(R.id.searchBox);
-        listView = view.findViewById(R.id.listview);
         radioGroup = view.findViewById(R.id.radioGroup);
-
+        openTxt = view.findViewById(R.id.openTxt);
+        closeTxt= view.findViewById(R.id.closeTxt);
+        lowTxt = view.findViewById(R.id.lowTxt);
+        highTxt = view.findViewById(R.id.highTxt);
+        volumeTxt = view.findViewById(R.id.volTxt);
         chart = view.findViewById(R.id.bar);
 
         dialog = new ProgressDialog(context);
@@ -109,15 +116,10 @@ public class HomeFragment extends Fragment {
 
         initView();
         searchBtn.setOnClickListener(tempView -> {
-            articleBtn.setVisibility(View.VISIBLE);
             newsList = new ArrayList<>();
-            listView.setVisibility(View.INVISIBLE);
             String crypto = cryptoTxt.getText().toString();
             name = crypto;
             searchRealPrice(crypto, choosed);
-        });
-        articleBtn.setOnClickListener(tempView -> {
-            searchNews();
         });
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -143,50 +145,6 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
-    void searchNews()
-    {
-        System.out.println("ㅎㅎㅎ");
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("ㅋㅋㅋ");
-                dialog.show();
-            }
-        });
-        OkHttpClient client = new OkHttpClient.Builder().connectTimeout(40, TimeUnit.SECONDS).writeTimeout(40, TimeUnit.SECONDS).readTimeout(40, TimeUnit.SECONDS).build();
-        HttpUrl.Builder urlBuilder;
-        urlBuilder = HttpUrl.parse("https://api.currentsapi.services/v1/search?keywords=" + name + "&language=en&apiKey=bUOAN1mHVyUahBl1LBy0uTDfcCtiYStsong5IkUzfUFErv5R").newBuilder();
-        String url = urlBuilder.build().toString();
-        System.out.println(url);
-        Request req = new Request.Builder().url(url).build();
-
-        client.newCall(req).enqueue(new Callback() {
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                final String myResponse = response.body().string();
-                Gson gson = new GsonBuilder().create();
-                newsList = gson.fromJson(myResponse, ResponseModel.class).getNews();
-                for(News n : newsList)
-                    System.out.println(n.getTitle());
-                NewsListViewAdapter newsListViewAdapter = new NewsListViewAdapter(context, newsList);
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        listView.setAdapter(newsListViewAdapter);
-                        articleBtn.setVisibility(View.INVISIBLE);
-                        listView.setVisibility(View.VISIBLE);
-                        dialog.dismiss();
-                    }
-                });
-
-            }
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                System.out.println(e.toString());
-                dialog.dismiss();
-            }
-        });
-    }
     void initView()
     {
         ChartMaker marker = new ChartMaker(context,R.layout.chart_maker);
@@ -203,9 +161,7 @@ public class HomeFragment extends Fragment {
     void addEntry(int numberOfChart) {
         LineData lineData = chart.getData();
         int size1 = cryptoCurrencies.size();
-        int size2 = expectedPrices.size();
         System.out.println(size1);
-        System.out.println(size2);
         ArrayList<Entry> data1 = new ArrayList<Entry>();
         i = 0;
         while (true) {
@@ -221,18 +177,6 @@ public class HomeFragment extends Fragment {
         ArrayList<ILineDataSet> lines = new ArrayList<ILineDataSet>();
         lines.add(dataset1);
 
-        System.out.println("------");
-        if(numberOfChart == 2) {
-            ArrayList<Entry> data2 = new ArrayList<Entry>();
-            i = size2 - 300;
-            for( ;i < size2; i++){
-                data2.add(new Entry(i + (size1- size2), (float) expectedPrices.get(i).getPrice()));
-                i++;
-            }
-            LineDataSet dataset2 = new LineDataSet(data2, "expected");
-            dataset2 = createRedSet(dataset2);
-            lines.add(dataset2);
-        }
         chart.setData(new LineData(lines));
         chart.setVisibleXRangeMaximum(size1 / 2);
         chart.moveViewToX(data1.size());
@@ -345,12 +289,25 @@ public class HomeFragment extends Fragment {
                 Type collectionType = new TypeToken<List<CryptoPrice>>(){}.getType();
                 cryptoCurrencies = (List<CryptoPrice>) new Gson()
                         .fromJson( myResponse , collectionType);
-                if(num == 2)
-                    searchPrice(name, num);
-                else {
-                    drawLineChart(1);
-                    dialog.dismiss();
-                }
+                curPrice = cryptoCurrencies.get(cryptoCurrencies.size()-1);
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        BigDecimal open = new BigDecimal(curPrice.getOpen());
+                        BigDecimal close = new BigDecimal(curPrice.getClose());
+                        BigDecimal high = new BigDecimal(curPrice.getHigh());
+                        BigDecimal low = new BigDecimal(curPrice.getLow());
+
+                        openTxt.setText(open.toString());
+                        closeTxt.setText(close.toString());
+                        lowTxt.setText(low.toString());
+                        highTxt.setText(high.toString());
+                        volumeTxt.setText(Float.toString(curPrice.getVolume()));
+
+                    }
+                });
+                drawLineChart(1);
+                dialog.dismiss();
             }
         });
 

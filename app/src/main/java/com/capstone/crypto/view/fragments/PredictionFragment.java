@@ -3,12 +3,14 @@ package com.capstone.crypto.view.fragments;
 import static java.lang.Math.*;
 import static java.lang.Math.abs;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -16,11 +18,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.capstone.crypto.R;
 import com.capstone.crypto.view.ResponseModel;
+import com.capstone.crypto.view.adapters.NewsListViewAdapter;
+import com.capstone.crypto.view.model.Articles;
 import com.capstone.crypto.view.model.CryptoPrice;
 import com.capstone.crypto.view.model.ExpectedPrice;
 import com.capstone.crypto.view.model.News;
@@ -39,6 +45,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -67,12 +75,15 @@ public class PredictionFragment extends Fragment {
     private String name;
     private float curPrice;
     private TextView noticeTxt;
+    private String date;
+    private TextView showArticleBtn;
+    private Integer crypto;
 
     int i = 0;
     int j = 0;
     public static List<CryptoPrice> cryptoCurrencies;
     public static List<ExpectedPrice> expectedPrices;
-    private ArrayList<News> newsList;
+    private List<Articles> newsList;
     private ResponseModel responseModel;
     Context context;
     public List<CryptoPrice> getCryptoCurrencies() {
@@ -92,9 +103,11 @@ public class PredictionFragment extends Fragment {
         context = container.getContext();
         searchBtn = view.findViewById(R.id.searchBtn2);
         cryptoTxt = view.findViewById(R.id.searchBox);
+        crypto = getArguments().getString("preference").equals("bitcoin") ? 2 : 1;
         chart = view.findViewById(R.id.bar);
         resultTxt = view.findViewById(R.id.resultTxt);
         noticeTxt = view.findViewById(R.id.textView9);
+        showArticleBtn = view.findViewById(R.id.showArticleBtn);
         dialog = new ProgressDialog(context);
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.setMessage("Data being processed...");
@@ -111,18 +124,19 @@ public class PredictionFragment extends Fragment {
                 float x = e.getX();
                 float expectedPrice = PredictionFragment.expectedPrices.get((int)x).getPrice();
                 double rate;
+                date = PredictionFragment.expectedPrices.get((int)x).getDateTime().substring(0,10);
                 System.out.println("--------------------");
                 System.out.println(expectedPrice);
                 System.out.println(curPrice);
                 rate = abs(round((expectedPrice - curPrice) / curPrice * 100 * 100) / 100.0);
                 if(curPrice < expectedPrice){
-                    resultTxt.setText("Expected Price : " + Utils.formatNumber(expectedPrice, 0, true) + "\n" + rate + "% increase compared to current price");
+                    resultTxt.setText(date + "\nExpected Price : " + Utils.formatNumber(expectedPrice, 0, true) + " (" + rate + "% increase)");
                     resultTxt.setTextColor(Color.RED);
                 }else if(curPrice > expectedPrice){
-                    resultTxt.setText("Expected Price : " + Utils.formatNumber(expectedPrice, 0, true) + "\n" + rate + "% decrease compared to current price");
+                    resultTxt.setText(date + "\nExpected Price : " + Utils.formatNumber(expectedPrice, 0, true) +" (" + rate + "% decrease)");
                     resultTxt.setTextColor(Color.BLUE);
                 }else{
-                    resultTxt.setText("Expected Price : " + Utils.formatNumber(expectedPrice, 0, true) + "\n" + "0% increase compared to current price" );
+                    resultTxt.setText(date + "\nExpected Price : " + Utils.formatNumber(expectedPrice, 0, true) + " (0% increase)" );
                     resultTxt.setTextColor(Color.BLACK);
                 }
             }
@@ -132,7 +146,54 @@ public class PredictionFragment extends Fragment {
 
             }
         });
+
+        showArticleBtn.setOnClickListener(thisView-> {
+            OkHttpClient client = new OkHttpClient.Builder().connectTimeout(40, TimeUnit.SECONDS).writeTimeout(40, TimeUnit.SECONDS).readTimeout(40, TimeUnit.SECONDS).build();
+            HttpUrl.Builder urlBuilder;
+//        urlBuilder = HttpUrl.parse("https://api.currentsapi.services/v1/search?keywords=" + name + "&language=en&apiKey=bUOAN1mHVyUahBl1LBy0uTDfcCtiYStsong5IkUzfUFErv5R").newBuilder();
+            urlBuilder = HttpUrl.parse("http://10.0.2.2:8080/news/" + date + "/" + crypto).newBuilder();
+            String url = urlBuilder.build().toString();
+            System.out.println(url);
+            Request req = new Request.Builder().url(url).build();
+
+            client.newCall(req).enqueue(new Callback() {
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    final String myResponse = response.body().string();
+                    Gson gson = new GsonBuilder().create();
+                    Type collectionType = new TypeToken<List<Articles>>() {
+                    }.getType();
+                    newsList = (List<Articles>) new Gson()
+                            .fromJson(myResponse, collectionType);
+                    for (Articles n : newsList)
+                        System.out.println(n.getTitle());
+                    NewsListViewAdapter newsListViewAdapter = new NewsListViewAdapter(context, newsList);
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            showDialog();
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    System.out.println(e.toString());
+                    dialog.dismiss();
+                }
+            });
+        });
         return view;
+    }
+
+    private void showDialog() {
+        Dialog dialog = new Dialog(context);
+        dialog.setContentView(R.layout.new_dialog);
+        ListView listView = (ListView) dialog.findViewById(R.id.listview_alterdialog_list);
+
+        NewsListViewAdapter adapter = new NewsListViewAdapter(context, newsList);
+        listView.setAdapter(adapter);
+        dialog.show();
     }
 
     void initView()
@@ -156,7 +217,7 @@ public class PredictionFragment extends Fragment {
                 i = 0;
                 break;
             }
-            data1.add(new Entry(i, (float) cryptoCurrencies.get(i).getHigh()));
+            data1.add(new Entry(i, (float) cryptoCurrencies.get(i).getClose()));
             i++;
         }
             LineDataSet dataset1 = new LineDataSet(data1, "actual");

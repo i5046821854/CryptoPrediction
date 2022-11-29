@@ -18,13 +18,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class NewsListViewAdapter extends BaseAdapter {
+public class TimeNewsListViewAdapter extends BaseAdapter {
 
     private Context mContext;
     private List<Articles> items;
     private Button readFullBtn;
 
-    public NewsListViewAdapter(Context mContext, List<Articles> items) {
+    public TimeNewsListViewAdapter(Context mContext, List<Articles> items) {
         this.mContext = mContext;
         this.items = items;
     }
@@ -44,17 +44,6 @@ public class NewsListViewAdapter extends BaseAdapter {
         return i;
     }
 
-    public final static String EXT_TITLE = "TITLE";
-    public final static String EXT_DESC = "DESC";
-    public final static String EXT_URL = "URL";
-    public final static String EXT_AUTHOR = "AUTHOR";
-    public final static String EXT_IMAGE = "IMAGE";
-    public final static String EXT_LANG = "LANG";
-    public final static String EXT_CATEGORY = "CATEGORY";
-    public final static String EXT_PUBLISHED = "PUBLISHED";
-
-
-
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
@@ -67,12 +56,8 @@ public class NewsListViewAdapter extends BaseAdapter {
         TextView titleTxt  = (TextView)view.findViewById(R.id.titleTxt2);
         readFullBtn = (Button)view.findViewById(R.id.detailBtn);
         Integer id = items.get(i).getArticleId();
-//        String author = (items.get(i).getAuthor() == null)? " " : items.get(i).getAuthor();
         String title = (items.get(i).getTitle() == null)? " ": items.get(i).getTitle();
-//        if(title.length() > 50)
-//            title = title.substring(0, 50);
         titleTxt.setText(title);
-        //authorTxt.setText(author);
         readFullBtn.setOnClickListener(tempView ->{
             Intent redirect = new Intent(Intent.ACTION_VIEW, Uri.parse(items.get(i).getSrc()));
             mContext.startActivity(redirect.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));

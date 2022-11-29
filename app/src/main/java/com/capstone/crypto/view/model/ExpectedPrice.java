@@ -4,7 +4,7 @@ public class ExpectedPrice {
 
     int priceId;
     float price;
-    String date_time;
+    String dateTime;
 
     public int getPriceId() {
         return priceId;
@@ -22,11 +22,11 @@ public class ExpectedPrice {
         this.price = price;
     }
 
-    public String getDate_time() {
-        return date_time;
+    public String getDateTime() {
+        return dateTime;
     }
 
     public void setDate_time(String date_time) {
-        this.date_time = date_time;
+        this.dateTime = date_time;
     }
 }
