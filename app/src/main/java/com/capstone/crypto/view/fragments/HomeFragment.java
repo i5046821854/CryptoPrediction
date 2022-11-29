@@ -1,5 +1,8 @@
 package com.capstone.crypto.view.fragments;
 
+import static java.lang.Math.abs;
+import static java.lang.Math.round;
+
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -36,8 +39,11 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.github.mikephil.charting.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
@@ -75,9 +81,11 @@ public class HomeFragment extends Fragment {
     private TextView volumeTxt;
     private CryptoPrice curPrice;
     private ProgressDialog dialog;
+    private TextView dateLbl;
     private Integer choosed = 2;
     private String name;
     private RadioGroup radioGroup;
+    private int checkNum;
 
     int i = 0;
     int j = 0;
@@ -104,6 +112,7 @@ public class HomeFragment extends Fragment {
         cryptoTxt = view.findViewById(R.id.searchBox);
         radioGroup = view.findViewById(R.id.radioGroup);
         openTxt = view.findViewById(R.id.openTxt);
+        dateLbl = view.findViewById(R.id.dateLbl);
         closeTxt= view.findViewById(R.id.closeTxt);
         lowTxt = view.findViewById(R.id.lowTxt);
         highTxt = view.findViewById(R.id.highTxt);
@@ -124,7 +133,7 @@ public class HomeFragment extends Fragment {
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int i) {
-                int checkNum = 0;
+                checkNum = 0;
                 switch(i){
                     case R.id.radioButton:
                         checkNum = 4;
@@ -142,6 +151,32 @@ public class HomeFragment extends Fragment {
                 searchRealPrice(name, checkNum);
             }
         });
+
+        chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, Highlight h) {
+                float x = e.getX();
+                double rate;
+                CryptoPrice crypto = cryptoCurrencies.get((int)x);
+                BigDecimal open = new BigDecimal(crypto.getOpen());
+                BigDecimal close = new BigDecimal(crypto.getClose());
+                BigDecimal high = new BigDecimal(crypto.getHigh());
+                BigDecimal low = new BigDecimal(crypto.getLow());
+                openTxt.setText(open.toString());
+                closeTxt.setText(close.toString());
+                lowTxt.setText(low.toString());
+                highTxt.setText(high.toString());
+                volumeTxt.setText(Float.toString(crypto.getVolume()));
+                dateLbl.setText("As of "+ crypto.getTime().substring(0,10));
+
+            }
+
+            @Override
+            public void onNothingSelected() {
+
+            }
+        });
+
         return view;
     }
 
@@ -303,6 +338,7 @@ public class HomeFragment extends Fragment {
                         lowTxt.setText(low.toString());
                         highTxt.setText(high.toString());
                         volumeTxt.setText(Float.toString(curPrice.getVolume()));
+                        dateLbl.setText("As of "+ curPrice.getTime().substring(0,10));
 
                     }
                 });

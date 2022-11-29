@@ -108,11 +108,12 @@ public class NewsFragment extends Fragment {
                         .fromJson( myResponse , collectionType);
                 for(Articles n : newsList)
                     System.out.println(n.getTitle());
-                NewsListViewAdapter newsListViewAdapter = new NewsListViewAdapter(context, newsList);
+                NewsListViewAdapter newsListViewAdapter = new NewsListViewAdapter(context, newsList, 2);
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         listView.setAdapter(newsListViewAdapter);
+                        System.out.println("zzz");
                         articleBtn.setVisibility(View.INVISIBLE);
                         listView.setVisibility(View.VISIBLE);
                         dialog.dismiss();

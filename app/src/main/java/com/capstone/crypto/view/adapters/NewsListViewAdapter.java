@@ -23,10 +23,12 @@ public class NewsListViewAdapter extends BaseAdapter {
     private Context mContext;
     private List<Articles> items;
     private Button readFullBtn;
+    private int type;
 
-    public NewsListViewAdapter(Context mContext, List<Articles> items) {
+    public NewsListViewAdapter(Context mContext, List<Articles> items, int type) {
         this.mContext = mContext;
         this.items = items;
+        this.type = type;
     }
 
     @Override
@@ -63,14 +65,26 @@ public class NewsListViewAdapter extends BaseAdapter {
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(R.layout.news_listview, viewGroup, false);
         }
-
+        System.out.println("tqweqwe");
         TextView titleTxt  = (TextView)view.findViewById(R.id.titleTxt2);
         readFullBtn = (Button)view.findViewById(R.id.detailBtn);
+        TextView dateTxt = view.findViewById(R.id.dateTxt);
         Integer id = items.get(i).getArticleId();
 //        String author = (items.get(i).getAuthor() == null)? " " : items.get(i).getAuthor();
         String title = (items.get(i).getTitle() == null)? " ": items.get(i).getTitle();
-//        if(title.length() > 50)
-//            title = title.substring(0, 50);
+        if(this.type == 2) {
+            dateTxt.setText(items.get(i).getDate());
+            if(title.length() > 30){
+                title = title.substring(0, 30);
+            }
+        }
+        else
+        {
+            if(title.length() > 25){
+                title = title.substring(0, 25);
+            }
+            dateTxt.setVisibility(View.GONE);
+        }
         titleTxt.setText(title);
         //authorTxt.setText(author);
         readFullBtn.setOnClickListener(tempView ->{

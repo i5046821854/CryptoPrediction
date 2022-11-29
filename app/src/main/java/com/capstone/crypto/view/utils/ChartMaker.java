@@ -27,13 +27,14 @@ public class ChartMaker extends MarkerView {
         float x = e.getX();
         float realPrice = HomeFragment.cryptoCurrencies.get((int)x).getClose();
         String date = HomeFragment.cryptoCurrencies.get((int)x).getTime();
-        tvContent.setText("Date : " + date.substring(0,10)+ "\nPrice : " + Utils.formatNumber( realPrice, 0, true));
+        int len = date.length();
+        tvContent.setText("Date : " + date.substring(2,len)+ "\nPrice : " + Utils.formatNumber( realPrice, 0, true));
         super.refreshContent(e, highlight);
     }
 
     @Override
     public MPPointF getOffset() {
-        return new MPPointF(-(getWidth() / 2), -getHeight() + 100);
+        return new MPPointF(-(getWidth() / 2), -getHeight() + 120);
     }
 
 }

@@ -20,29 +20,34 @@
     <!--        app:layout_constraintVertical_bias="0.0" />-->
 
     <LinearLayout
+        android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal"></LinearLayout>
+        android:orientation="horizontal">
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/titleTxt2"
         android:layout_width="310dp"
-        android:layout_height="60dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
         android:fontFamily="serif"
         android:gravity="center_vertical"
         android:text="TextView"
         android:textColor="#1B1A1A"
-        android:textSize="15sp"
-        android:layout_marginLeft="5dp"
+        android:textSize="13sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/linearLayout2"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.525" />
 
     <Button
         android:id="@+id/detailBtn"
         android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="5dp"
         android:minWidth="0dp"
         android:minHeight="0dp"
@@ -52,5 +57,18 @@
         app:layout_constraintBottom_toBottomOf="@+id/titleTxt2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/titleTxt2" />
+
+    <TextView
+        android:id="@+id/dateTxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_weight="1"
+        android:text="TextView"
+        android:textColor="#712D2D"
+        android:textSize="10sp"
+        android:visibility="visible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/titleTxt2" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

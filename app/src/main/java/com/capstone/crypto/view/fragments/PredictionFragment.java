@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -47,6 +48,7 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 import org.jetbrains.annotations.NotNull;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -78,6 +80,7 @@ public class PredictionFragment extends Fragment {
     private String date;
     private TextView showArticleBtn;
     private Integer crypto;
+    private String preference;
 
     int i = 0;
     int j = 0;
@@ -103,7 +106,8 @@ public class PredictionFragment extends Fragment {
         context = container.getContext();
         searchBtn = view.findViewById(R.id.searchBtn2);
         cryptoTxt = view.findViewById(R.id.searchBox);
-        crypto = getArguments().getString("preference").equals("bitcoin") ? 2 : 1;
+        preference =  getArguments().getString("preference");
+        crypto = preference.equals("bitcoin") ? 2 : 1;
         chart = view.findViewById(R.id.bar);
         resultTxt = view.findViewById(R.id.resultTxt);
         noticeTxt = view.findViewById(R.id.textView9);
@@ -163,11 +167,11 @@ public class PredictionFragment extends Fragment {
                     Gson gson = new GsonBuilder().create();
                     Type collectionType = new TypeToken<List<Articles>>() {
                     }.getType();
+                    System.out.println(myResponse);
                     newsList = (List<Articles>) new Gson()
                             .fromJson(myResponse, collectionType);
                     for (Articles n : newsList)
                         System.out.println(n.getTitle());
-                    NewsListViewAdapter newsListViewAdapter = new NewsListViewAdapter(context, newsList);
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -189,10 +193,19 @@ public class PredictionFragment extends Fragment {
     private void showDialog() {
         Dialog dialog = new Dialog(context);
         dialog.setContentView(R.layout.new_dialog);
+        WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+        params.width = WindowManager.LayoutParams.MATCH_PARENT;
+        params.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        dialog.getWindow().setAttributes(params);
         ListView listView = (ListView) dialog.findViewById(R.id.listview_alterdialog_list);
-
-        NewsListViewAdapter adapter = new NewsListViewAdapter(context, newsList);
+        NewsListViewAdapter adapter = new NewsListViewAdapter(context, newsList, 1);
         listView.setAdapter(adapter);
+        TextView title = dialog.findViewById(R.id.textview_alterdialog_title);
+        TextView noArticle = dialog.findViewById(R.id.noArticleTxt);
+        if(newsList.size() == 0)
+            noArticle.setVisibility(View.VISIBLE);
+        title.setText("Articles about " + preference.toUpperCase() + "\n on " + date);
+        dialog.setTitle("custom dialog !!");
         dialog.show();
     }
 
