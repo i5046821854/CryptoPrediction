@@ -47,6 +47,7 @@ public class MenuActivity extends AppCompatActivity {
         bundle.putString("id", userId);
         bundle.putInt("img", img);
         bundle.putString("nickname", nickname);
+        System.out.println("pref : " +  preference);
         homeFragment.setArguments(bundle);
         fragmentManager.beginTransaction().replace(R.id.menu_frame_layout, homeFragment).commitAllowingStateLoss();
         bottomNavigationView = findViewById(R.id.bottom_menu);

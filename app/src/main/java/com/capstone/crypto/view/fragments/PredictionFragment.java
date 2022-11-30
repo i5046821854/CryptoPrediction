@@ -37,6 +37,7 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
@@ -126,12 +127,10 @@ public class PredictionFragment extends Fragment {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
                 float x = e.getX();
-                float expectedPrice = PredictionFragment.expectedPrices.get((int)x).getPrice();
+                ExpectedPrice expected = expectedPrices.get((int)x - 1282);
+                float expectedPrice = expected.getPrice();
                 double rate;
-                date = PredictionFragment.expectedPrices.get((int)x).getDateTime().substring(0,10);
-                System.out.println("--------------------");
-                System.out.println(expectedPrice);
-                System.out.println(curPrice);
+                date = expected.getDateTime().substring(0,10);
                 rate = abs(round((expectedPrice - curPrice) / curPrice * 100 * 100) / 100.0);
                 if(curPrice < expectedPrice){
                     resultTxt.setText(date + "\nExpected Price : " + Utils.formatNumber(expectedPrice, 0, true) + " (" + rate + "% increase)");
@@ -167,11 +166,8 @@ public class PredictionFragment extends Fragment {
                     Gson gson = new GsonBuilder().create();
                     Type collectionType = new TypeToken<List<Articles>>() {
                     }.getType();
-                    System.out.println(myResponse);
                     newsList = (List<Articles>) new Gson()
                             .fromJson(myResponse, collectionType);
-                    for (Articles n : newsList)
-                        System.out.println(n.getTitle());
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -221,8 +217,6 @@ public class PredictionFragment extends Fragment {
         LineData lineData = chart.getData();
         int size1 = cryptoCurrencies.size();
         int size2 = expectedPrices.size();
-        System.out.println(size1);
-        System.out.println(size2);
         ArrayList<Entry> data1 = new ArrayList<Entry>();
         i = 0;
         while (true) {
@@ -237,11 +231,10 @@ public class PredictionFragment extends Fragment {
             dataset1 = createBlueSet(dataset1);
             ArrayList<ILineDataSet> lines = new ArrayList<ILineDataSet>();
             lines.add(dataset1);
-            System.out.println("------");
             ArrayList<Entry> data2 = new ArrayList<Entry>();
             i = size2 - 300;
             for( ;i < size2; i++){
-                data2.add(new Entry(i + (size1- size2), (float) expectedPrices.get(i).getPrice()));
+                data2.add(new Entry(i + 1282, (float) expectedPrices.get(i).getPrice()));
                 i++;
             }
             LineDataSet dataset2 = new LineDataSet(data2, "expected");
@@ -274,7 +267,7 @@ public class PredictionFragment extends Fragment {
     public ArrayList<String> getAreaCount() {
         ArrayList<String> label = new ArrayList<>();
         for (int i = 0; i < cryptoCurrencies.size(); i++)
-            label.add(cryptoCurrencies.get(i).getTime().substring(2,10));
+            label.add(cryptoCurrencies.get(i).getTime());
 //        for (int i = 0; i < expectedPrices.size(); i++)
 //            label.add(expectedPrices.get(i).getTime().substring(2));
         return label;
@@ -286,7 +279,7 @@ public class PredictionFragment extends Fragment {
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setTextSize(10f);
         xAxis.setDrawGridLines(false);
-//        xAxis.setValueFormatter(new IndexAxisValueFormatter(getAreaCount()));
+        xAxis.setValueFormatter(new IndexAxisValueFormatter(getAreaCount()));
         YAxis leftAxis = chart.getAxisRight();
         leftAxis.setDrawGridLines(false);
         YAxis rightAxis = chart.getAxisRight();
@@ -306,6 +299,7 @@ public class PredictionFragment extends Fragment {
         set.setFillAlpha(95);
         set.setFillColor(ColorTemplate.getHoloBlue());
         set.setHighLightColor(Color.rgb(244,177,177));
+        set.setHighlightLineWidth(0.8f);
         set.setDrawValues(false);
         return set;
     }
@@ -319,6 +313,7 @@ public class PredictionFragment extends Fragment {
         set.setFillAlpha(95);
         set.setFillColor(Color.RED);
         set.setHighLightColor(Color.rgb(244,177,177));
+        set.setHighlightLineWidth(0.8f);
         set.setDrawValues(false);
         return set;
     }
@@ -354,13 +349,11 @@ public class PredictionFragment extends Fragment {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 final String myResponse = response.body().string();
-                System.out.println(myResponse);
                 Gson gson = new GsonBuilder().create();
                 Type collectionType = new TypeToken<List<CryptoPrice>>(){}.getType();
                 cryptoCurrencies = (List<CryptoPrice>) new Gson()
                         .fromJson( myResponse , collectionType);
                 curPrice = cryptoCurrencies.get(cryptoCurrencies.size()-1).getHigh();
-                System.out.println("curPrice :"  +  curPrice);
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -389,7 +382,6 @@ public class PredictionFragment extends Fragment {
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 final String myResponse = response.body().string();
                 Gson gson = new GsonBuilder().create();
-                System.out.println(myResponse);
                 Type collectionType = new TypeToken<List<ExpectedPrice>>(){}.getType();
                 try{
                     expectedPrices = (List<ExpectedPrice>) new Gson()
@@ -403,7 +395,6 @@ public class PredictionFragment extends Fragment {
                             }
                         });
                     }
-                    System.out.println("zz" + expectedPrices.size());
                     drawLineChart();
                     dialog.dismiss();
                 }catch (JsonSyntaxException e)

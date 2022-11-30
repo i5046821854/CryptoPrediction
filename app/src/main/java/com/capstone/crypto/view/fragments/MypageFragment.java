@@ -124,7 +124,6 @@ public class MypageFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 snapshot.getChildren().forEach( child-> {
                     Chat chat = child.getValue(Chat.class);
-                    System.out.println(chat.getId() + " +"  + userId);
                     if(chat.getId().equals(userId))
                         keyList.add(child.getKey());
                 });
@@ -179,7 +178,6 @@ public class MypageFragment extends Fragment {
             db.execSQL(query);
             Bundle bundle = new Bundle();
             bundle.putString("preference", preferenceTxt);
-            System.out.println("changed into " + preferenceTxt);
             bundle.putString("id", userId);
             bundle.putInt("img", imgIdx);
             bundle.putString("nickname", newNickname);

@@ -3,6 +3,7 @@ package com.capstone.crypto.view.fragments;
 import static java.lang.Math.abs;
 import static java.lang.Math.round;
 
+import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,10 +14,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -26,19 +29,23 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.capstone.crypto.R;
+import com.capstone.crypto.view.CustomDatePickerDialog;
 import com.capstone.crypto.view.adapters.NewsListViewAdapter;
 import com.capstone.crypto.view.ResponseModel;
+import com.capstone.crypto.view.model.CryptoCurrency;
 import com.capstone.crypto.view.model.CryptoPrice;
 import com.capstone.crypto.view.model.ExpectedPrice;
 import com.capstone.crypto.view.model.News;
 import com.capstone.crypto.view.utils.ChartMaker;
 import com.capstone.crypto.view.views.MenuActivity;
+import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
@@ -54,7 +61,10 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -86,9 +96,10 @@ public class HomeFragment extends Fragment {
     private String name;
     private RadioGroup radioGroup;
     private int checkNum;
-
+    private ImageView datePickerBtn;
     int i = 0;
     int j = 0;
+    int size1 = 0;
     public static List<CryptoPrice> cryptoCurrencies;
     public static List<ExpectedPrice> expectedPrices;
     private ArrayList<News> newsList;
@@ -102,6 +113,20 @@ public class HomeFragment extends Fragment {
         return expectedPrices;
     }
 
+
+    int getIdx(String year, String month, String day) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        Date d1 = sdf.parse(year+month+day);
+        for(int i = 0 ; i < size1; i++){
+            CryptoPrice crypto = cryptoCurrencies.get(i);
+            Date d2 = sdf.parse(crypto.getTime().substring(0,4)+crypto.getTime().substring(5,7)+crypto.getTime().substring(8,10));
+            if(d1.equals(d2))
+                return i;
+            else if(d2.after(d1))
+                return i-1;
+        }
+        return -1;
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -115,6 +140,7 @@ public class HomeFragment extends Fragment {
         dateLbl = view.findViewById(R.id.dateLbl);
         closeTxt= view.findViewById(R.id.closeTxt);
         lowTxt = view.findViewById(R.id.lowTxt);
+        datePickerBtn = view.findViewById(R.id.button);
         highTxt = view.findViewById(R.id.highTxt);
         volumeTxt = view.findViewById(R.id.volTxt);
         chart = view.findViewById(R.id.bar);
@@ -124,6 +150,41 @@ public class HomeFragment extends Fragment {
         dialog.setMessage("Data being processed...");
 
         initView();
+
+        DatePickerDialog.OnDateSetListener d = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int day){
+                Log.d("YearMonthPickerTest", "year = " + year + ", month = " + month + ", day = " + day);
+                int idx = 0;
+                try {
+                    String yearStr = String.valueOf(year);
+                    String monthStr = String.valueOf(month);
+                    String dayStr = String.valueOf(day);
+
+                    if(month < 10)
+                        monthStr = '0' + monthStr;
+                    if(day < 10)
+                        dayStr = '0' + dayStr;
+                    idx = getIdx(yearStr,monthStr, dayStr);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                Highlight h = new Highlight(idx, 0,0);
+                chart.highlightValue(h);
+                chart.moveViewToX(idx);
+                changeBottom(idx);
+            }
+        };
+
+
+        datePickerBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                CustomDatePickerDialog pd = new CustomDatePickerDialog();
+                pd.setListener(d);
+                pd.show(getFragmentManager(), "Year Month Picker");
+            }
+        });
         searchBtn.setOnClickListener(tempView -> {
             newsList = new ArrayList<>();
             String crypto = cryptoTxt.getText().toString();
@@ -156,19 +217,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
                 float x = e.getX();
-                double rate;
-                CryptoPrice crypto = cryptoCurrencies.get((int)x);
-                BigDecimal open = new BigDecimal(crypto.getOpen());
-                BigDecimal close = new BigDecimal(crypto.getClose());
-                BigDecimal high = new BigDecimal(crypto.getHigh());
-                BigDecimal low = new BigDecimal(crypto.getLow());
-                openTxt.setText(open.toString());
-                closeTxt.setText(close.toString());
-                lowTxt.setText(low.toString());
-                highTxt.setText(high.toString());
-                volumeTxt.setText(Float.toString(crypto.getVolume()));
-                dateLbl.setText("As of "+ crypto.getTime().substring(0,10));
-
+                changeBottom(x);
             }
 
             @Override
@@ -180,14 +229,50 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
+    void changeBottom(float x){
+        CryptoPrice crypto = cryptoCurrencies.get((int)x);
+        CryptoPrice prev = cryptoCurrencies.get((int)x - 1);
+        BigDecimal open = new BigDecimal(crypto.getOpen());
+        BigDecimal close = new BigDecimal(crypto.getClose());
+        BigDecimal high = new BigDecimal(crypto.getHigh());
+        BigDecimal low = new BigDecimal(crypto.getLow());
+        openTxt.setText(open.toString());
+        closeTxt.setText(close.toString());
+        lowTxt.setText(low.toString());
+        highTxt.setText(high.toString());
+        volumeTxt.setText(Float.toString(crypto.getVolume()));
+        dateLbl.setText("As of "+ crypto.getTime().substring(0,10));
+        if(crypto.getOpen() >= prev.getOpen())
+            openTxt.setTextColor(Color.RED);
+        else
+            openTxt.setTextColor(Color.BLUE);
+        if(crypto.getClose() >= prev.getClose())
+            closeTxt.setTextColor(Color.RED);
+        else
+            closeTxt.setTextColor(Color.BLUE);
+        if(crypto.getHigh() >= prev.getHigh())
+            highTxt.setTextColor(Color.RED);
+        else
+            highTxt.setTextColor(Color.BLUE);
+        if(crypto.getLow() >= prev.getLow())
+            lowTxt.setTextColor(Color.RED);
+        else
+            lowTxt.setTextColor(Color.BLUE);
+        if(crypto.getClose() >= prev.getClose())
+            closeTxt.setTextColor(Color.RED);
+        else
+            closeTxt.setTextColor(Color.BLUE);
+        if(crypto.getVolume() >= prev.getVolume())
+            volumeTxt.setTextColor(Color.RED);
+        else
+            volumeTxt.setTextColor(Color.BLUE);
+    }
     void initView()
     {
         ChartMaker marker = new ChartMaker(context,R.layout.chart_maker);
         marker.setChartView(chart);
         chart.setMarker(marker);
-//        name = this.getArguments().getString("preference");
-        name = "bitcoin";
-        System.out.println(name);
+        name = getArguments().getString("preference");
         cryptoTxt.setText(name);
         searchRealPrice(name, choosed);
     }
@@ -195,8 +280,7 @@ public class HomeFragment extends Fragment {
 
     void addEntry(int numberOfChart) {
         LineData lineData = chart.getData();
-        int size1 = cryptoCurrencies.size();
-        System.out.println(size1);
+        size1 = cryptoCurrencies.size();
         ArrayList<Entry> data1 = new ArrayList<Entry>();
         i = 0;
         while (true) {
@@ -204,7 +288,7 @@ public class HomeFragment extends Fragment {
                 i = 0;
                 break;
             }
-            data1.add(new Entry(i, (float) cryptoCurrencies.get(i).getHigh()));
+            data1.add(new Entry(i, (float) cryptoCurrencies.get(i).getClose()));
             i++;
         }
         LineDataSet dataset1 = new LineDataSet(data1, "actual");
@@ -238,10 +322,8 @@ public class HomeFragment extends Fragment {
 
     public ArrayList<String> getAreaCount() {
         ArrayList<String> label = new ArrayList<>();
-        for (int i = 0; i < cryptoCurrencies.size(); i++)
-            label.add(cryptoCurrencies.get(i).getTime().substring(2,10));
-//        for (int i = 0; i < expectedPrices.size(); i++)
-//            label.add(expectedPrices.get(i).getTime().substring(2));
+            for (int i = 0; i < cryptoCurrencies.size(); i++)
+                label.add(cryptoCurrencies.get(i).getTime().substring(2,10));
         return label;
     }
 
@@ -251,7 +333,7 @@ public class HomeFragment extends Fragment {
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setTextSize(10f);
         xAxis.setDrawGridLines(false);
-//        xAxis.setValueFormatter(new IndexAxisValueFormatter(getAreaCount()));
+        xAxis.setValueFormatter(new IndexAxisValueFormatter(getAreaCount()));
         YAxis leftAxis = chart.getAxisRight();
         leftAxis.setDrawGridLines(false);
         YAxis rightAxis = chart.getAxisRight();
@@ -270,23 +352,12 @@ public class HomeFragment extends Fragment {
         set.setDrawCircles(false);
         set.setFillAlpha(95);
         set.setFillColor(ColorTemplate.getHoloBlue());
-        set.setHighLightColor(Color.rgb(244,177,177));
+        set.setHighLightColor(Color.RED);
+        set.setHighlightLineWidth(0.8f);
         set.setDrawValues(false);
         return set;
     }
 
-    private LineDataSet createRedSet(LineDataSet set)
-    {
-        set.setAxisDependency(YAxis.AxisDependency.LEFT);
-        set.setColor(Color.RED);
-        set.setLineWidth(4f);
-        set.setDrawCircles(false);
-        set.setFillAlpha(95);
-        set.setFillColor(Color.RED);
-        set.setHighLightColor(Color.rgb(244,177,177));
-        set.setDrawValues(false);
-        return set;
-    }
     void searchRealPrice(String name, int num)
     {
         getActivity().runOnUiThread(new Runnable() {
@@ -319,7 +390,6 @@ public class HomeFragment extends Fragment {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 final String myResponse = response.body().string();
-                System.out.println(myResponse);
                 Gson gson = new GsonBuilder().create();
                 Type collectionType = new TypeToken<List<CryptoPrice>>(){}.getType();
                 cryptoCurrencies = (List<CryptoPrice>) new Gson()
@@ -364,7 +434,6 @@ public class HomeFragment extends Fragment {
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 final String myResponse = response.body().string();
                 Gson gson = new GsonBuilder().create();
-                System.out.println(myResponse);
                 Type collectionType = new TypeToken<List<ExpectedPrice>>(){}.getType();
                 try{
                     expectedPrices = (List<ExpectedPrice>) new Gson()
@@ -378,7 +447,6 @@ public class HomeFragment extends Fragment {
                             }
                         });
                     }
-                    System.out.println("zz" + expectedPrices.size());
                     drawLineChart(2);
                     dialog.dismiss();
 //                    searchRealPrice(name, num);

@@ -55,7 +55,6 @@ public class ChatFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         chatList = new ArrayList<>();
-        System.out.println("화면 시작!!");
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
         titleTxt = view.findViewById(R.id.chatRoomTitle);
         listView = view.findViewById(R.id.chatListView);
@@ -67,7 +66,6 @@ public class ChatFragment extends Fragment {
         preference = getArguments().getString("preference");
         image = getArguments().getInt("img");
         nickname = getArguments().getString("nickname");
-        System.out.println(userId);
         titleTxt.setText("Chat Room for " + preference.toUpperCase());
 
         database = FirebaseDatabase.getInstance();
@@ -110,7 +108,6 @@ public class ChatFragment extends Fragment {
         sendBtn.setOnClickListener(thisView -> {
             Date today = new Date();
             SimpleDateFormat timeNow = new SimpleDateFormat("a K:mm");
-            System.out.println("zzzz");
             ref.push().setValue(new Chat(0, userId, nickname, chatText.getText().toString(), timeNow.format(today), preference, image));
 //            ref.push().setValue(new Chat(0, userId, chatText.getText().toString(), LocalDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG))));
             chatText.setText("");
@@ -118,9 +115,7 @@ public class ChatFragment extends Fragment {
         listener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                System.out.println("애디드!!");
                 Chat value = dataSnapshot.getValue(Chat.class); // 괄호 안 : 꺼낼 자료 형태
-                System.out.println(value.getContent());
                 if(value.getCrypto().equals(preference)){
                     chatList.add(value);
                     adapter.notifyDataSetChanged();
@@ -128,7 +123,6 @@ public class ChatFragment extends Fragment {
             }
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                System.out.println("@@@@@@@@@child changed!");
                 ((MenuActivity)getActivity()).changeFrag(3, bundle);
             }
 
@@ -168,7 +162,6 @@ public class ChatFragment extends Fragment {
 
     @Override
     public void onPause() {
-        System.out.println("paused");
         ref.removeEventListener(listener);
         super.onPause();
     }
