@@ -71,7 +71,7 @@ public class RegisterActivity extends AppCompatActivity {
         chooseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final String[] items = new String[]{"Etherium", "bitcoin"};
+                final String[] items = new String[]{"Ethereum", "bitcoin"};
                 AlertDialog.Builder dialog = new AlertDialog.Builder(RegisterActivity.this);
                 dialog.setTitle("Choose Your Preferred CryptoCurrency")
                         .setSingleChoiceItems(items
@@ -87,7 +87,7 @@ public class RegisterActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 Toast.makeText(RegisterActivity.this, "관심 분야가 선택되었습니다", Toast.LENGTH_SHORT).show();
                                 if(preference != -1)
-                                    preferenceTxt = (preference == 1 ? "etherium": "bitcoin");
+                                    preferenceTxt = (preference == 1 ? "ethereum": "bitcoin");
                                 chooseBtn.setText("You have Chosen :" + preferenceTxt);
                             }
                         }).setNeutralButton("취소", new DialogInterface.OnClickListener() {

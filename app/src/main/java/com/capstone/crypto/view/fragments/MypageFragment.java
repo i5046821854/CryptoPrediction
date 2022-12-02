@@ -49,7 +49,7 @@ public class MypageFragment extends Fragment {
     Integer imgIdx;
     String preferenceTxt;
     String ogTxt;
-    String[] items = new String[]{"Etherium", "bitcoin"};
+    String[] items = new String[]{"Ethereum", "bitcoin"};
     Context context;
     String userId;
     HashSet<String> keyList = new HashSet<>();
@@ -76,14 +76,14 @@ public class MypageFragment extends Fragment {
             nickname = cursor.getString(3);
             imgIdx = Integer.parseInt(cursor.getString(4));
             preference = Integer.parseInt(cursor.getString(5));
-            ogTxt = (preference == 1 ? "etherium" : "bitcoin");
+            ogTxt = (preference == 1 ? "ethereum" : "bitcoin");
         }
         preferenceTxt = ogTxt;
         nicknameEdit.setText(nickname);
         chooseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final String[] items = new String[]{"Etherium", "bitcoin"};
+                final String[] items = new String[]{"Ethereum", "bitcoin"};
                 AlertDialog.Builder dialog = new AlertDialog.Builder(context);
                 dialog.setTitle("Choose Your Preferred CryptoCurrency")
                         .setSingleChoiceItems(items
@@ -99,7 +99,7 @@ public class MypageFragment extends Fragment {
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 Toast.makeText(context, "관심 분야가 선택되었습니다", Toast.LENGTH_SHORT).show();
                                 if(preference != -1)
-                                    preferenceTxt = (preference == 1 ? "etherium": "bitcoin");
+                                    preferenceTxt = (preference == 1 ? "ethereum": "bitcoin");
                                 chooseBtn.setText("You have Chosen :" + preferenceTxt);
                             }
                         }).setNeutralButton("취소", new DialogInterface.OnClickListener() {

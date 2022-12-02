@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         String crypto = cryptoTxt.getText().toString();
 //        Intent intent = new Intent(MainActivity.this, PriceActivity.class);
         Intent intent = new Intent(MainActivity.this, MenuActivity.class);
-        crypto = (preference == 1? "etherium" : "bitcoin");
+        crypto = (preference == 1? "ethereum" : "bitcoin");
         intent.putExtra("name", crypto);
         intent.putExtra("id", id);
         intent.putExtra("nickname", nickname);
