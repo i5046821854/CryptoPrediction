@@ -367,6 +367,8 @@ public class HomeFragment extends Fragment {
             }
         });
         String crypto = name.toLowerCase(Locale.ROOT);
+        if(crypto.equals("ethereum"))
+            crypto = "etherium";
         OkHttpClient client = new OkHttpClient.Builder().connectTimeout(20, TimeUnit.SECONDS).writeTimeout(20, TimeUnit.SECONDS).readTimeout(20, TimeUnit.SECONDS).build();
         HttpUrl.Builder urlBuilder;
 //        urlBuilder = HttpUrl.parse("https://jongseol-crypto.herokuapp.com/real/"+ num + "/"+crypto).newBuilder();
@@ -421,13 +423,14 @@ public class HomeFragment extends Fragment {
     void searchPrice(String name, int num)
     {
         String crypto = name.toLowerCase(Locale.ROOT);
+        if(crypto.equals("ethereum"))
+            crypto = "etherium";
         OkHttpClient client = new OkHttpClient.Builder().build();
         HttpUrl.Builder urlBuilder;
 //        urlBuilder = HttpUrl.parse("https://jongseol-crypto.herokuapp.com/"+crypto).newBuilder();
         urlBuilder = HttpUrl.parse("http://10.0.2.2:8080/"+crypto).newBuilder();
         String url = urlBuilder.build().toString();
         System.out.println(url);
-
         Request req = new Request.Builder().url(url).build();
         client.newCall(req).enqueue(new Callback() {
             @Override

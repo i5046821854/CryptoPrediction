@@ -326,6 +326,8 @@ public class PredictionFragment extends Fragment {
             }
         });
         String crypto = name.toLowerCase(Locale.ROOT);
+        if(crypto.equals("ethereum"))
+            crypto = "etherium";
         OkHttpClient client = new OkHttpClient.Builder().connectTimeout(20, TimeUnit.SECONDS).writeTimeout(20, TimeUnit.SECONDS).readTimeout(20, TimeUnit.SECONDS).build();
         HttpUrl.Builder urlBuilder;
 //        urlBuilder = HttpUrl.parse("https://jongseol-crypto.herokuapp.com/real/"+ num + "/"+crypto).newBuilder();
@@ -353,6 +355,8 @@ public class PredictionFragment extends Fragment {
                 Type collectionType = new TypeToken<List<CryptoPrice>>(){}.getType();
                 cryptoCurrencies = (List<CryptoPrice>) new Gson()
                         .fromJson( myResponse , collectionType);
+                System.out.println("sizeC :" + cryptoCurrencies.size());
+                System.out.println("sizeE :" + expectedPrices.size());
                 curPrice = cryptoCurrencies.get(cryptoCurrencies.size()-1).getHigh();
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
@@ -369,6 +373,8 @@ public class PredictionFragment extends Fragment {
     void searchPrice(String name)
     {
         String crypto = name.toLowerCase(Locale.ROOT);
+        if(crypto.equals("ethereum"))
+            crypto = "etherium";
         OkHttpClient client = new OkHttpClient.Builder().build();
         HttpUrl.Builder urlBuilder;
 //        urlBuilder = HttpUrl.parse("https://jongseol-crypto.herokuapp.com/"+crypto).newBuilder();
