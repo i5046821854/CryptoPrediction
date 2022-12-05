@@ -93,7 +93,7 @@ public class NewsFragment extends Fragment {
         OkHttpClient client = new OkHttpClient.Builder().connectTimeout(40, TimeUnit.SECONDS).writeTimeout(40, TimeUnit.SECONDS).readTimeout(40, TimeUnit.SECONDS).build();
         HttpUrl.Builder urlBuilder;
 //        urlBuilder = HttpUrl.parse("https://api.currentsapi.services/v1/search?keywords=" + name + "&language=en&apiKey=bUOAN1mHVyUahBl1LBy0uTDfcCtiYStsong5IkUzfUFErv5R").newBuilder();
-        urlBuilder = HttpUrl.parse("http://10.0.2.2:8080/news/" + crypto).newBuilder();
+        urlBuilder = HttpUrl.parse("http://3.39.61.211:8080/news/" + crypto).newBuilder();
         String url = urlBuilder.build().toString();
         System.out.println(url);
         Request req = new Request.Builder().url(url).build();
