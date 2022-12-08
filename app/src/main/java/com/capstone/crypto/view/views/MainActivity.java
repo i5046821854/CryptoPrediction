@@ -33,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
         Intent getIntent = getIntent();
         id = getIntent.getStringExtra("id");
         id = (id == null ? "leeyoungshin" : id);
-        System.out.println(id);
         cryptoTxt = (TextView) findViewById(R.id.cryptoNameTxt);
         searchBtn = (Button) findViewById(R.id.searchBtn);
         imageView = (ImageView) findViewById(R.id.imageView3);
@@ -67,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("id", id);
         intent.putExtra("nickname", nickname);
         intent.putExtra("img", image);
-        System.out.println(crypto);
         startActivity(intent);
     }
 

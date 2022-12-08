@@ -49,7 +49,7 @@ public class MypageFragment extends Fragment {
     Integer imgIdx;
     String preferenceTxt;
     String ogTxt;
-    String[] items = new String[]{"Ethereum", "bitcoin"};
+    String[] items = new String[]{"Ethereum", "bitcoin", "Terra", "Solana", "XRP", "Tether", "USD Coin"};
     Context context;
     String userId;
     HashSet<String> keyList = new HashSet<>();

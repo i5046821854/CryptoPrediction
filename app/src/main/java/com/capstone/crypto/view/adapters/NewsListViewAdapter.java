@@ -65,7 +65,6 @@ public class NewsListViewAdapter extends BaseAdapter {
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(R.layout.news_listview, viewGroup, false);
         }
-        System.out.println("tqweqwe");
         TextView titleTxt  = (TextView)view.findViewById(R.id.titleTxt2);
         readFullBtn = (Button)view.findViewById(R.id.detailBtn);
         TextView dateTxt = view.findViewById(R.id.dateTxt);

@@ -40,14 +40,11 @@ public class MenuActivity extends AppCompatActivity {
         userId = intent.getStringExtra("id");
         nickname = intent.getStringExtra("nickname");
         img = intent.getIntExtra("img", 1);
-        System.out.println(img);
-        System.out.println("userID : " + userId);
         bundle= new Bundle();
         bundle.putString("preference", preference);
         bundle.putString("id", userId);
         bundle.putInt("img", img);
         bundle.putString("nickname", nickname);
-        System.out.println("pref : " +  preference);
         homeFragment.setArguments(bundle);
         fragmentManager.beginTransaction().replace(R.id.menu_frame_layout, homeFragment).commitAllowingStateLoss();
         bottomNavigationView = findViewById(R.id.bottom_menu);
@@ -93,7 +90,6 @@ public class MenuActivity extends AppCompatActivity {
             bottomNavigationView.getMenu().getItem(0).setChecked(true);
             bundle = newBundle;
             homeFragment.setArguments(bundle);
-            System.out.println(bundle.getString("preference"));
             getSupportFragmentManager().beginTransaction().replace(R.id.menu_frame_layout, homeFragment).commitAllowingStateLoss();
         }else if(idx == 2){  //to Mypage
             bottomNavigationView.getMenu().getItem(4).setChecked(true);
@@ -102,13 +98,11 @@ public class MenuActivity extends AppCompatActivity {
         }else if(idx == 3){
             bottomNavigationView.getMenu().getItem(3).setChecked(true);
             chatFragment.setArguments(bundle);
-            System.out.println("called!");
             getSupportFragmentManager().beginTransaction().replace(R.id.menu_frame_layout, chatFragment).commitAllowingStateLoss();
         }
         else if(idx == 4){
             bottomNavigationView.getMenu().getItem(2).setChecked(true);
             chatFragment.setArguments(bundle);
-            System.out.println("called!");
             getSupportFragmentManager().beginTransaction().replace(R.id.menu_frame_layout, chatFragment).commitAllowingStateLoss();
         }
     }

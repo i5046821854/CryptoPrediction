@@ -73,7 +73,6 @@ public class ChatListViewAdapter extends BaseAdapter {
         ImageView my_image = (ImageView)convertView.findViewById(R.id.my_image);
         ImageView tv_image = (ImageView)convertView.findViewById(R.id.tv_image);
 
-        System.out.println(chatData.get(position).getId() + " " + userId);
         if(chatData.get(position).getId().equals(userId)){
             tv_time.setVisibility(View.GONE);
             tv_name.setVisibility(View.GONE);

@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,21 +82,23 @@ public class PredictionFragment extends Fragment {
     private float curPrice;
     private TextView noticeTxt;
     private String date;
-    private TextView showArticleBtn;
+    private Button showArticleBtn;
     private TextView momentumPro;
     private TextView anormalyPro;
+    private TextView textView8;
     private TextView sentimentalPro;
     private ProgressBar progressBar1;
     private ProgressBar progressBar2;
     private ProgressBar progressBar3;
     private Integer crypto;
+    private float tomorrowPrice;
     private String preference;
 
     int i = 0;
     int j = 0;
     public static List<CryptoPrice> cryptoCurrencies;
     public static List<ExpectedPrice> expectedPrices;
-    private Integer diff = 0;
+    private Integer diff = 1899 - 378;
     private List<Articles> newsList;
     private ResponseModel responseModel;
     Context context;
@@ -124,25 +127,11 @@ public class PredictionFragment extends Fragment {
         showArticleBtn = view.findViewById(R.id.showArticleBtn);
         momentumPro = view.findViewById(R.id.momPro);
         anormalyPro = view.findViewById(R.id.anoPro);
+        textView8 = view.findViewById(R.id.textView8);
         sentimentalPro = view.findViewById(R.id.senPro);
         progressBar1 = view.findViewById(R.id.progressBar);
         progressBar2 = view.findViewById(R.id.progressBar2);
         progressBar3 = view.findViewById(R.id.progressBar3);
-        if(crypto == 1){
-            momentumPro.setTextColor(Color.RED);
-            anormalyPro.setTextColor(Color.BLUE);
-            sentimentalPro.setText("Positive");
-            anormalyPro.setText("Low");
-            progressBar1.setProgressTintList(ColorStateList.valueOf(Color.RED));
-            progressBar2.setProgressTintList(ColorStateList.valueOf(Color.BLUE));
-        }else{
-            momentumPro.setTextColor(Color.RED);
-            anormalyPro.setTextColor(Color.BLUE);
-            sentimentalPro.setText("Negative");
-            anormalyPro.setText("Low");
-            progressBar1.setProgressTintList(ColorStateList.valueOf(Color.BLUE));
-            progressBar2.setProgressTintList(ColorStateList.valueOf(Color.BLUE));
-        }
         sentimentalPro = view.findViewById(R.id.senPro);
 
         dialog = new ProgressDialog(context);
@@ -150,17 +139,25 @@ public class PredictionFragment extends Fragment {
         dialog.setMessage("Data being processed...");
 
         initView();
+
         searchBtn.setOnClickListener(tempView -> {
-            String crypto = cryptoTxt.getText().toString();
-            name = crypto;
-            searchRealPrice(crypto);
+            String cryptoStr = cryptoTxt.getText().toString();
+            name = cryptoStr;
+            preference = name;
+            crypto = name.equals("bitcoin") ? 2 : 1;
+            initView();
+//            searchRealPrice(cryptoStr);
         });
         chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
                 float x = e.getX();
+                if((int)x - diff < 0)
+                    return;
                 ExpectedPrice expected = expectedPrices.get((int)x - diff);
+                CryptoPrice prev = cryptoCurrencies.get((int)x - diff - 1);
                 float expectedPrice = expected.getPrice();
+                float prevPrice = prev.getClose();
                 double rate;
                 date = expected.getDateTime().substring(0,10);
                 rate = abs(round((expectedPrice - curPrice) / curPrice * 100 * 100) / 100.0);
@@ -186,9 +183,8 @@ public class PredictionFragment extends Fragment {
             OkHttpClient client = new OkHttpClient.Builder().connectTimeout(40, TimeUnit.SECONDS).writeTimeout(40, TimeUnit.SECONDS).readTimeout(40, TimeUnit.SECONDS).build();
             HttpUrl.Builder urlBuilder;
 //        urlBuilder = HttpUrl.parse("https://api.currentsapi.services/v1/search?keywords=" + name + "&language=en&apiKey=bUOAN1mHVyUahBl1LBy0uTDfcCtiYStsong5IkUzfUFErv5R").newBuilder();
-            urlBuilder = HttpUrl.parse("http://10.0.2.2:8080/news/" + date + "/" + crypto).newBuilder();
+            urlBuilder = HttpUrl.parse("http://3.39.61.211:8080/news/" + date + "/" + crypto).newBuilder();
             String url = urlBuilder.build().toString();
-            System.out.println(url);
             Request req = new Request.Builder().url(url).build();
 
             client.newCall(req).enqueue(new Callback() {
@@ -239,7 +235,22 @@ public class PredictionFragment extends Fragment {
 
     void initView()
     {
-        name = this.getArguments().getString("preference");
+        if(crypto == 1){
+            sentimentalPro.setTextColor(Color.RED);
+            anormalyPro.setTextColor(Color.BLUE);
+            sentimentalPro.setText("Positive");
+            anormalyPro.setText("Low Possibility");
+            progressBar1.setProgressTintList(ColorStateList.valueOf(Color.RED));
+            progressBar2.setProgressTintList(ColorStateList.valueOf(Color.BLUE));
+        }else{
+            sentimentalPro.setTextColor(Color.BLUE);
+            anormalyPro.setTextColor(Color.BLUE);
+            sentimentalPro.setText("Negative");
+            anormalyPro.setText("Low Possibility");
+            progressBar1.setProgressTintList(ColorStateList.valueOf(Color.BLUE));
+            progressBar2.setProgressTintList(ColorStateList.valueOf(Color.BLUE));
+        }
+        name = preference;
         cryptoTxt.setText(name);
         searchRealPrice(name);
     }
@@ -264,7 +275,7 @@ public class PredictionFragment extends Fragment {
         ArrayList<ILineDataSet> lines = new ArrayList<ILineDataSet>();
         lines.add(dataset1);
         ArrayList<Entry> data2 = new ArrayList<Entry>();
-        i = size2 - 300;
+        i = 0;
         for( ;i < size2; i++){
             data2.add(new Entry(i + diff, (float) expectedPrices.get(i).getPrice() - 300));
             i++;
@@ -283,7 +294,7 @@ public class PredictionFragment extends Fragment {
         chart.highlightValue(h);
 
         chart.setVisibleXRangeMaximum(size1 / 2);
-        chart.moveViewToX(data1.size() + 100);
+        chart.moveViewToX(data1.size());
     }
 
     void feedMultiple()
@@ -340,7 +351,7 @@ public class PredictionFragment extends Fragment {
         set.setFillAlpha(95);
         set.setFillColor(ColorTemplate.getHoloBlue());
         set.setHighLightColor(Color.rgb(244,177,177));
-        set.setHighlightLineWidth(0.8f);
+        set.setHighlightLineWidth(1.5f);
         set.setDrawValues(false);
         return set;
     }
@@ -354,7 +365,7 @@ public class PredictionFragment extends Fragment {
         set.setFillAlpha(95);
         set.setFillColor(Color.RED);
         set.setHighLightColor(Color.rgb(244,177,177));
-        set.setHighlightLineWidth(0.8f);
+        set.setHighlightLineWidth(1.5f);
         set.setDrawValues(false);
         return set;
     }
@@ -362,15 +373,16 @@ public class PredictionFragment extends Fragment {
     private LineDataSet createGreenSet(LineDataSet set)
     {
         set.setAxisDependency(YAxis.AxisDependency.LEFT);
-        set.setColor(Color.GREEN);
+        set.setColor(Color.parseColor("#00804b"));
         set.setDrawCircles(true);
         set.setCircleRadius(5);
-        set.setCircleColor(Color.GREEN);
+        set.setCircleHoleColor(Color.parseColor("#00804b"));
+        set.setCircleColor(Color.parseColor("#00804b"));
 //        set.setFillAlpha(95);
-        set.setColor(Color.GREEN);
+        set.setColor(Color.parseColor("#00804b"));
 //        set.setHighLightColor(Color.rgb(244,177,177));
-        set.setHighlightLineWidth(0.8f);
-        set.setDrawValues(false);
+        set.setHighlightLineWidth(1.5f);
+        set.setDrawValues(true);
         return set;
     }
 
@@ -390,7 +402,6 @@ public class PredictionFragment extends Fragment {
 //        urlBuilder = HttpUrl.parse("https://jongseol-crypto.herokuapp.com/real/"+ num + "/"+crypto).newBuilder();
         urlBuilder = HttpUrl.parse("http://3.39.61.211:8080/real/"+ 2 + "/"+crypto).newBuilder();
         String url = urlBuilder.build().toString();
-        System.out.println(url);
         Request req = new Request.Builder().url(url).build();
         client.newCall(req).enqueue(new Callback() {
             @Override
@@ -412,24 +423,30 @@ public class PredictionFragment extends Fragment {
                 Type collectionType = new TypeToken<List<CryptoPrice>>(){}.getType();
                 cryptoCurrencies = (List<CryptoPrice>) new Gson()
                         .fromJson( myResponse , collectionType);
-                System.out.println("sizeC :" + cryptoCurrencies.size());
                 int size = cryptoCurrencies.size();
-                curPrice = cryptoCurrencies.get(size-1).getHigh();
+                diff = size - 378;
+                curPrice = cryptoCurrencies.get(size-1).getClose();
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        resultTxt.setText("Current Price : " + Utils.formatNumber(curPrice, 0, true));
+                        resultTxt.setText("Current Price : " + Utils.formatNumber(curPrice, 0, true, ','));
+                        cryptoTxt.setText(name);
                     }
                 });
-                if(curPrice < cryptoCurrencies.get(size - 2).getHigh()){
-                    progressBar3.setProgressTintList(ColorStateList.valueOf(Color.BLUE));
-                    anormalyPro.setTextColor(Color.BLUE);
-                    anormalyPro.setText(String.valueOf(curPrice - cryptoCurrencies.get(size - 2).getHigh()));
-                }else{
-                    progressBar3.setProgressTintList(ColorStateList.valueOf(Color.RED));
-                    anormalyPro.setTextColor(Color.RED);
-                    anormalyPro.setText("+" + String.valueOf(curPrice - cryptoCurrencies.get(size - 2).getHigh()));
-                }
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(curPrice < cryptoCurrencies.get(size - 2).getHigh()){
+                            progressBar3.setProgressTintList(ColorStateList.valueOf(Color.BLUE));
+                            momentumPro.setTextColor(Color.BLUE);
+                            momentumPro.setText(String.valueOf(curPrice - cryptoCurrencies.get(size - 2).getHigh()));
+                        }else{
+                            progressBar3.setProgressTintList(ColorStateList.valueOf(Color.RED));
+                            momentumPro.setTextColor(Color.RED);
+                            momentumPro.setText("+" + String.valueOf(curPrice - cryptoCurrencies.get(size - 2).getHigh()));
+                        }
+                    }
+                });
                 searchPrice(name);
             }
         });
@@ -445,7 +462,6 @@ public class PredictionFragment extends Fragment {
 //        urlBuilder = HttpUrl.parse("https://jongseol-crypto.herokuapp.com/"+crypto).newBuilder();
         urlBuilder = HttpUrl.parse("http://3.39.61.211:8080/"+crypto).newBuilder();
         String url = urlBuilder.build().toString();
-        System.out.println(url);
 
         Request req = new Request.Builder().url(url).build();
         client.newCall(req).enqueue(new Callback() {
@@ -467,6 +483,15 @@ public class PredictionFragment extends Fragment {
                         });
                     }
                     drawLineChart();
+                    tomorrowPrice = expectedPrices.get(expectedPrices.size()-1).getPrice();
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            textView8.setText("Expected Crypto Price for Tomorrow : " + Utils.formatNumber(tomorrowPrice, 0, true, ','));
+                            textView8.setTextColor(Color.BLACK);
+                        }
+                    });
+
                     dialog.dismiss();
                 }catch (JsonSyntaxException e)
                 {

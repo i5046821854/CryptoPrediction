@@ -1,5 +1,6 @@
 package com.capstone.crypto.view.views;
 
+import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -26,12 +28,14 @@ public class RegisterActivity extends AppCompatActivity {
     Button validCheckBtn;
     Button chooseBtn;
     Button signupBtn;
+    Button profileBtn;
     int idFlag = 0;
     int preference = -1;
     String preferenceTxt;
     DBHelper helper;
     SQLiteDatabase db;
     String confirmed;
+    int imgIdx = 0;
 
     void initView(){
         idTxt = findViewById(R.id.idRegTxt);
@@ -40,6 +44,7 @@ public class RegisterActivity extends AppCompatActivity {
         validCheckBtn = findViewById(R.id.idCheckBtn);
         chooseBtn = findViewById(R.id.jobBtn);
         signupBtn = findViewById(R.id.singupBtn);
+        profileBtn = findViewById(R.id.profileBtn);
         helper = new DBHelper(RegisterActivity.this, "newdb.db", null, 1);
         db = helper.getWritableDatabase();
     }
@@ -49,6 +54,42 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register_layout);
         initView();
+
+        profileBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Dialog dialog = new Dialog(getApplicationContext());
+                dialog.setContentView(R.layout.imgdialog_layout);
+                dialog.setTitle("custom dialog !!");
+                ImageView img1 = (ImageView) dialog.findViewById(R.id.image1);
+                ImageView img2 = (ImageView) dialog.findViewById(R.id.image2);
+                ImageView img3 = (ImageView) dialog.findViewById(R.id.image3);
+                ImageView img4 = (ImageView) dialog.findViewById(R.id.image4);
+                dialog.show();
+                img1.setOnClickListener(thisView -> {
+                    imgIdx = 0;
+                    profileBtn.setText("lee.jpg");
+                    dialog.dismiss();
+                });
+                img2.setOnClickListener(thisView -> {
+                    imgIdx = 1;
+                    profileBtn.setText("ronaldo.jpg");
+                    dialog.dismiss();
+                });
+                img3.setOnClickListener(thisView -> {
+                    imgIdx = 2;
+                    profileBtn.setText("delon.jpg");
+                    dialog.dismiss();
+                });
+                img4.setOnClickListener(thisView -> {
+                    imgIdx = 3;
+                    profileBtn.setText("cha.jpg");
+                    dialog.dismiss();
+                });
+            }
+
+        });
+
 
         validCheckBtn.setOnClickListener(view -> {
             String id = idTxt.getText().toString();
@@ -121,7 +162,7 @@ public class RegisterActivity extends AppCompatActivity {
                 cv.put("username", confirmed);
                 cv.put("password", pwdTxt.getText().toString());
                 cv.put("nickname", nicknameTxt.getText().toString());
-                cv.put("image", 1);
+                cv.put("image", imgIdx);
                 cv.put("preference", preference);
                 db.insertWithOnConflict("USERS", null, cv, SQLiteDatabase.CONFLICT_REPLACE);
                 Intent intent = new Intent(RegisterActivity.this, MainActivity.class);

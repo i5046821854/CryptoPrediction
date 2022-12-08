@@ -230,6 +230,8 @@ public class HomeFragment extends Fragment {
     }
 
     void changeBottom(float x){
+        if((int)x == -1)
+            return;
         CryptoPrice crypto = cryptoCurrencies.get((int)x);
         CryptoPrice prev = cryptoCurrencies.get((int)x - 1);
         BigDecimal open = new BigDecimal(crypto.getOpen());
@@ -242,6 +244,7 @@ public class HomeFragment extends Fragment {
         highTxt.setText(high.toString());
         volumeTxt.setText(Float.toString(crypto.getVolume()));
         dateLbl.setText("As of "+ crypto.getTime().substring(0,10));
+        dateLbl.setTextColor(Color.BLACK);
         if(crypto.getOpen() >= prev.getOpen())
             openTxt.setTextColor(Color.RED);
         else
@@ -374,7 +377,6 @@ public class HomeFragment extends Fragment {
 //        urlBuilder = HttpUrl.parse("https://jongseol-crypto.herokuapp.com/real/"+ num + "/"+crypto).newBuilder();
         urlBuilder = HttpUrl.parse("http://3.39.61.211:8080/real/"+ num + "/"+crypto).newBuilder();
         String url = urlBuilder.build().toString();
-        System.out.println(url);
         Request req = new Request.Builder().url(url).build();
         client.newCall(req).enqueue(new Callback() {
             @Override
@@ -404,13 +406,13 @@ public class HomeFragment extends Fragment {
                         BigDecimal close = new BigDecimal(curPrice.getClose());
                         BigDecimal high = new BigDecimal(curPrice.getHigh());
                         BigDecimal low = new BigDecimal(curPrice.getLow());
-
                         openTxt.setText(open.toString());
                         closeTxt.setText(close.toString());
                         lowTxt.setText(low.toString());
                         highTxt.setText(high.toString());
                         volumeTxt.setText(Float.toString(curPrice.getVolume()));
                         dateLbl.setText("As of "+ curPrice.getTime().substring(0,10));
+                        cryptoTxt.setText(name);
 
                     }
                 });
@@ -430,7 +432,6 @@ public class HomeFragment extends Fragment {
 //        urlBuilder = HttpUrl.parse("https://jongseol-crypto.herokuapp.com/"+crypto).newBuilder();
         urlBuilder = HttpUrl.parse("http://3.39.61.211:8080/"+crypto).newBuilder();
         String url = urlBuilder.build().toString();
-        System.out.println(url);
         Request req = new Request.Builder().url(url).build();
         client.newCall(req).enqueue(new Callback() {
             @Override

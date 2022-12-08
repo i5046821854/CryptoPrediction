@@ -11,7 +11,6 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        System.out.println("zz");
         String sql = "DROP TABLE if exists USERS";
         db.execSQL(sql);
 
