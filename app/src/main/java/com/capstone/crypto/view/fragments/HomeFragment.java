@@ -190,6 +190,10 @@ public class HomeFragment extends Fragment {
             String crypto = cryptoTxt.getText().toString();
             name = crypto;
             searchRealPrice(crypto, choosed);
+            Highlight h = new Highlight(size1-1, 0,0);
+            chart.highlightValue(h);
+            chart.moveViewToX(size1-1);
+
         });
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -283,7 +287,6 @@ public class HomeFragment extends Fragment {
 
     void addEntry(int numberOfChart) {
         LineData lineData = chart.getData();
-        size1 = cryptoCurrencies.size();
         ArrayList<Entry> data1 = new ArrayList<Entry>();
         i = 0;
         while (true) {
@@ -399,6 +402,7 @@ public class HomeFragment extends Fragment {
                 cryptoCurrencies = (List<CryptoPrice>) new Gson()
                         .fromJson( myResponse , collectionType);
                 curPrice = cryptoCurrencies.get(cryptoCurrencies.size()-1);
+                size1 = cryptoCurrencies.size();
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

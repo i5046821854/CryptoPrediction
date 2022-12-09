@@ -155,16 +155,16 @@ public class PredictionFragment extends Fragment {
                 if((int)x - diff < 0)
                     return;
                 ExpectedPrice expected = expectedPrices.get((int)x - diff);
-                CryptoPrice prev = cryptoCurrencies.get((int)x - diff - 1);
+                ExpectedPrice prev = expectedPrices.get((int)x - diff - 1);
                 float expectedPrice = expected.getPrice();
-                float prevPrice = prev.getClose();
+                float prevPrice = prev.getPrice();
                 double rate;
                 date = expected.getDateTime().substring(0,10);
-                rate = abs(round((expectedPrice - curPrice) / curPrice * 100 * 100) / 100.0);
-                if(curPrice < expectedPrice){
+                rate = abs(round((expectedPrice - prevPrice) / prevPrice * 100 * 100) / 100.0);
+                if(prevPrice < expectedPrice){
                     resultTxt.setText(date + "\nExpected Price : " + Utils.formatNumber(expectedPrice, 0, true) + " (" + rate + "% increase)");
                     resultTxt.setTextColor(Color.RED);
-                }else if(curPrice > expectedPrice){
+                }else if(prevPrice > expectedPrice){
                     resultTxt.setText(date + "\nExpected Price : " + Utils.formatNumber(expectedPrice, 0, true) +" (" + rate + "% decrease)");
                     resultTxt.setTextColor(Color.BLUE);
                 }else{

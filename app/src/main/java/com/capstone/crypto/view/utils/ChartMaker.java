@@ -28,7 +28,7 @@ public class ChartMaker extends MarkerView {
         float realPrice = HomeFragment.cryptoCurrencies.get((int)x).getClose();
         String date = HomeFragment.cryptoCurrencies.get((int)x).getTime();
         int len = date.length();
-        tvContent.setText("Date : " + date.substring(2,len)+ "\nPrice : " + Utils.formatNumber( realPrice, 0, true));
+        tvContent.setText("Date : " + date.substring(2,10)+ "\nPrice : " + Utils.formatNumber( realPrice, 0, true));
         super.refreshContent(e, highlight);
     }
 

@@ -58,7 +58,7 @@ public class RegisterActivity extends AppCompatActivity {
         profileBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Dialog dialog = new Dialog(getApplicationContext());
+                Dialog dialog = new Dialog(RegisterActivity.this);
                 dialog.setContentView(R.layout.imgdialog_layout);
                 dialog.setTitle("custom dialog !!");
                 ImageView img1 = (ImageView) dialog.findViewById(R.id.image1);
@@ -112,7 +112,7 @@ public class RegisterActivity extends AppCompatActivity {
         chooseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final String[] items = new String[]{"Ethereum", "bitcoin"};
+                final String[] items = new String[]{"Ethereum", "Bitcoin"};
                 AlertDialog.Builder dialog = new AlertDialog.Builder(RegisterActivity.this);
                 dialog.setTitle("Choose Your Preferred CryptoCurrency")
                         .setSingleChoiceItems(items
@@ -126,7 +126,7 @@ public class RegisterActivity extends AppCompatActivity {
                         .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                Toast.makeText(RegisterActivity.this, "관심 분야가 선택되었습니다", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(RegisterActivity.this, "Selection Completed!", Toast.LENGTH_SHORT).show();
                                 if(preference != -1)
                                     preferenceTxt = (preference == 1 ? "ethereum": "bitcoin");
                                 chooseBtn.setText("You have Chosen :" + preferenceTxt);
@@ -165,7 +165,7 @@ public class RegisterActivity extends AppCompatActivity {
                 cv.put("image", imgIdx);
                 cv.put("preference", preference);
                 db.insertWithOnConflict("USERS", null, cv, SQLiteDatabase.CONFLICT_REPLACE);
-                Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                 intent.putExtra("id", confirmed);
                 startActivity(intent);
             }
