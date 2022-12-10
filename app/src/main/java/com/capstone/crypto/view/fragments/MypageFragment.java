@@ -38,39 +38,42 @@ import java.util.HashSet;
 
 public class MypageFragment extends Fragment {
 
-    public Boolean occupy;
-    Button chooseBtn;
-    Button confirmBtn;
-    Button imageChooseBtn;
-    EditText nicknameEdit;
-    String nickname;
-    Integer preference;
-
-    Integer imgIdx;
-    String preferenceTxt;
-    String ogTxt;
-    String[] items = new String[]{"Ethereum", "bitcoin", "Terra", "Solana", "XRP", "Tether", "USD Coin"};
-    Context context;
-    String userId;
-    HashSet<String> keyList = new HashSet<>();
+    private Button chooseBtn;
+    private Button confirmBtn;
+    private Button imageChooseBtn;
+    private  EditText nicknameEdit;
+    private String nickname;
+    private Integer preference;
+    private Integer imgIdx;
+    private String preferenceTxt;
+    private String ogTxt;
+    private String[] items = new String[]{"Ethereum", "bitcoin", "Terra", "Solana", "XRP", "Tether", "USD Coin"};
+    private Context context;
+    private String userId;
+    private HashSet<String> keyList = new HashSet<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_mypage, container, false);
         context = container.getContext();
+
+        // Initailize variables
         imageChooseBtn = (Button) view.findViewById(R.id.imageBtn);
         chooseBtn = (Button) view.findViewById(R.id.jobBtn);
         confirmBtn = (Button) view.findViewById(R.id.regBtn);
         nicknameEdit = (EditText) view.findViewById(R.id.idRegTxt);
-
         userId = getArguments().getString("id");
+
+        // get a db connection
         DBHelper helper;
         SQLiteDatabase db;
         helper = new DBHelper(context, "newdb.db", null, 1);
         db = helper.getWritableDatabase();
 
+        // get user info from db
         Cursor cursor = db.rawQuery("SELECT * FROM USERS WHERE username = '" + userId + "'", null);
         while(cursor.moveToNext()){
             nickname = cursor.getString(3);
@@ -80,6 +83,8 @@ public class MypageFragment extends Fragment {
         }
         preferenceTxt = ogTxt;
         nicknameEdit.setText(nickname);
+
+        //dialog for choosing preferred type of crypto
         chooseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -118,7 +123,7 @@ public class MypageFragment extends Fragment {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference ref = database.getReference("message");
 
-
+        //update database for message to reflect change in nickname and profile pic
         ValueEventListener listener = new ValueEventListener(){
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -137,6 +142,7 @@ public class MypageFragment extends Fragment {
         ref.addListenerForSingleValueEvent(listener);
         ref.removeEventListener(listener);
 
+        //dialog to change default profile picture
         imageChooseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -172,6 +178,7 @@ public class MypageFragment extends Fragment {
 
         });
 
+        // send a request to server to update user profile
         confirmBtn.setOnClickListener(thisView -> {
             String newNickname = nicknameEdit.getText().toString();
             String query = "UPDATE USERS SET nickname = '" + newNickname + "', preference = " + preference + ", image = " + imgIdx;

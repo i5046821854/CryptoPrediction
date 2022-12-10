@@ -3,6 +3,7 @@ package com.capstone.crypto.view.utils;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
+//Make DB Connection btw android and SQLite
 public class DBconnection {
     DBHelper helper;
     SQLiteDatabase db;

@@ -17,6 +17,8 @@ import com.capstone.crypto.view.utils.DBconnection;
 
 import java.util.ArrayList;
 
+
+//listView Adapter for the chat room
 public class ChatListViewAdapter extends BaseAdapter {
 
     private Context context;
@@ -26,9 +28,6 @@ public class ChatListViewAdapter extends BaseAdapter {
     private String userId;
     private String preference;
     private Integer imgArr[] = {R.drawable.lee, R.drawable.cr, R.drawable.alang, R.drawable.cha};
-    private DBHelper helper;
-    private SQLiteDatabase db;
-    private Integer image = 0;
 
     public ChatListViewAdapter(Context context, int chat_listview, ArrayList<Chat> array, String userId, String preference) {
         this.context = context;
@@ -37,9 +36,6 @@ public class ChatListViewAdapter extends BaseAdapter {
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.userId = userId;
         this.preference = preference;
-        DBconnection dBconnection = new DBconnection(context);
-        this.helper = dBconnection.getHelper();
-        this.db = dBconnection.getDb();
     }
 
     @Override
@@ -57,12 +53,15 @@ public class ChatListViewAdapter extends BaseAdapter {
         return position;
     }
 
+
+    //how to handle each chat message
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
         if(convertView == null){
             convertView = inflater.inflate(layout, parent, false); //아이디를 가지고 view를 만든다
         }
+
         String nickname = chatData.get(position).getNickname();
         TextView tv_msg = (TextView)convertView.findViewById(R.id.tv_content);
         TextView tv_time = (TextView)convertView.findViewById(R.id.tv_time);
@@ -73,7 +72,7 @@ public class ChatListViewAdapter extends BaseAdapter {
         ImageView my_image = (ImageView)convertView.findViewById(R.id.my_image);
         ImageView tv_image = (ImageView)convertView.findViewById(R.id.tv_image);
 
-        if(chatData.get(position).getId().equals(userId)){
+        if(chatData.get(position).getId().equals(userId)){  //show user's message
             tv_time.setVisibility(View.GONE);
             tv_name.setVisibility(View.GONE);
             tv_msg.setVisibility(View.GONE);
@@ -88,7 +87,7 @@ public class ChatListViewAdapter extends BaseAdapter {
             my_msg.setText(chatData.get(position).getContent());
             my_image.setImageResource(imgArr[chatData.get(position).getImage()]);
         }
-        else{
+        else{   //show other users' message
             tv_time.setVisibility(View.VISIBLE);
             tv_name.setVisibility(View.VISIBLE);
             tv_msg.setVisibility(View.VISIBLE);

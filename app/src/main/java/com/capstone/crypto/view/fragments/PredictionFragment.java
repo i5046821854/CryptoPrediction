@@ -93,22 +93,21 @@ public class PredictionFragment extends Fragment {
     private Integer crypto;
     private float tomorrowPrice;
     private String preference;
-
-    int i = 0;
-    int j = 0;
     public static List<CryptoPrice> cryptoCurrencies;
     public static List<ExpectedPrice> expectedPrices;
     private Integer diff = 1899 - 378;
     private List<Articles> newsList;
     private ResponseModel responseModel;
-    Context context;
+    private Context context;
     public List<CryptoPrice> getCryptoCurrencies() {
         return cryptoCurrencies;
     }
-
     public List<ExpectedPrice> getExpectedPrices() {
         return expectedPrices;
     }
+
+    int i = 0;
+    int j = 0;
 
 
     @Override
@@ -117,37 +116,27 @@ public class PredictionFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_prediction, container, false);
         context = container.getContext();
-        searchBtn = view.findViewById(R.id.searchBtn2);
-        cryptoTxt = view.findViewById(R.id.searchBox);
-        preference =  getArguments().getString("preference");
-        crypto = preference.equals("bitcoin") ? 2 : 1;
-        chart = view.findViewById(R.id.bar);
-        resultTxt = view.findViewById(R.id.resultTxt);
-        noticeTxt = view.findViewById(R.id.textView9);
-        showArticleBtn = view.findViewById(R.id.showArticleBtn);
-        momentumPro = view.findViewById(R.id.momPro);
-        anormalyPro = view.findViewById(R.id.anoPro);
-        textView8 = view.findViewById(R.id.textView8);
-        sentimentalPro = view.findViewById(R.id.senPro);
-        progressBar1 = view.findViewById(R.id.progressBar);
-        progressBar2 = view.findViewById(R.id.progressBar2);
-        progressBar3 = view.findViewById(R.id.progressBar3);
-        sentimentalPro = view.findViewById(R.id.senPro);
 
+        // Initialize Variables
+        initVars(view, container);
+
+        // Make a dialog to make user wait for the processing of the data
         dialog = new ProgressDialog(context);
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.setMessage("Data being processed...");
 
-        initView();
+        initSearch();
 
+        // Search another type of cryptocurrency
         searchBtn.setOnClickListener(tempView -> {
             String cryptoStr = cryptoTxt.getText().toString();
             name = cryptoStr;
             preference = name;
             crypto = name.equals("bitcoin") ? 2 : 1;
-            initView();
-//            searchRealPrice(cryptoStr);
+            initSearch();
         });
+
+        // Event Handler when a certain point on a graph is selected
         chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
@@ -179,10 +168,12 @@ public class PredictionFragment extends Fragment {
             }
         });
 
+        //generate a list view of article of specific date
         showArticleBtn.setOnClickListener(thisView-> {
+
+            //ask server to return the list of articles
             OkHttpClient client = new OkHttpClient.Builder().connectTimeout(40, TimeUnit.SECONDS).writeTimeout(40, TimeUnit.SECONDS).readTimeout(40, TimeUnit.SECONDS).build();
             HttpUrl.Builder urlBuilder;
-//        urlBuilder = HttpUrl.parse("https://api.currentsapi.services/v1/search?keywords=" + name + "&language=en&apiKey=bUOAN1mHVyUahBl1LBy0uTDfcCtiYStsong5IkUzfUFErv5R").newBuilder();
             urlBuilder = HttpUrl.parse("http://3.39.61.211:8080/news/" + date + "/" + crypto).newBuilder();
             String url = urlBuilder.build().toString();
             Request req = new Request.Builder().url(url).build();
@@ -214,6 +205,27 @@ public class PredictionFragment extends Fragment {
         return view;
     }
 
+    // Initialize Variables
+    void initVars(View view, ViewGroup container){
+        searchBtn = view.findViewById(R.id.searchBtn2);
+        cryptoTxt = view.findViewById(R.id.searchBox);
+        preference =  getArguments().getString("preference");
+        crypto = preference.equals("bitcoin") ? 2 : 1;
+        chart = view.findViewById(R.id.bar);
+        resultTxt = view.findViewById(R.id.resultTxt);
+        noticeTxt = view.findViewById(R.id.textView9);
+        showArticleBtn = view.findViewById(R.id.showArticleBtn);
+        momentumPro = view.findViewById(R.id.momPro);
+        anormalyPro = view.findViewById(R.id.anoPro);
+        textView8 = view.findViewById(R.id.textView8);
+        sentimentalPro = view.findViewById(R.id.senPro);
+        progressBar1 = view.findViewById(R.id.progressBar);
+        progressBar2 = view.findViewById(R.id.progressBar2);
+        progressBar3 = view.findViewById(R.id.progressBar3);
+        sentimentalPro = view.findViewById(R.id.senPro);
+    }
+
+    //Dialog configuration
     private void showDialog() {
         Dialog dialog = new Dialog(context);
         dialog.setContentView(R.layout.new_dialog);
@@ -233,7 +245,8 @@ public class PredictionFragment extends Fragment {
         dialog.show();
     }
 
-    void initView()
+    // Default search with default search parameters (preferred type of crypto)
+    void initSearch()
     {
         if(crypto == 1){
             sentimentalPro.setTextColor(Color.RED);
@@ -255,11 +268,12 @@ public class PredictionFragment extends Fragment {
         searchRealPrice(name);
     }
 
-
+    // make entries of the graph
     void addEntry() {
-        LineData lineData = chart.getData();
         int size1 = cryptoCurrencies.size();
         int size2 = expectedPrices.size();
+
+        //blue graph (actual price)
         ArrayList<Entry> data1 = new ArrayList<Entry>();
         i = 0;
         while (true) {
@@ -274,6 +288,8 @@ public class PredictionFragment extends Fragment {
         dataset1 = createBlueSet(dataset1);
         ArrayList<ILineDataSet> lines = new ArrayList<ILineDataSet>();
         lines.add(dataset1);
+
+        //red graph (predicted price)
         ArrayList<Entry> data2 = new ArrayList<Entry>();
         i = 0;
         for( ;i < size2; i++){
@@ -284,6 +300,7 @@ public class PredictionFragment extends Fragment {
         dataset2 = createRedSet(dataset2);
         lines.add(dataset2);
 
+        //green graph (tomorrow's predicted price)
         ArrayList<Entry> data3 = new ArrayList<Entry>();
         data3.add(new Entry(i + diff, (float) expectedPrices.get(size2 -1).getPrice() - 300));
         LineDataSet dataset3 = new LineDataSet(data3, "Tomorrow");
@@ -293,10 +310,11 @@ public class PredictionFragment extends Fragment {
         chart.setData(new LineData(lines));
         chart.highlightValue(h);
 
-        chart.setVisibleXRangeMaximum(size1 / 2);
-        chart.moveViewToX(data1.size());
+        chart.setVisibleXRangeMaximum(size1 / 2);  //set default range of visible range
+        chart.moveViewToX(data1.size()); //set default starting point
     }
 
+    //make a dataset via multithreading
     void feedMultiple()
     {
         if(thread != null)
@@ -316,15 +334,15 @@ public class PredictionFragment extends Fragment {
         thread.start();
     }
 
+    //set the name of x-axis
     public ArrayList<String> getAreaCount() {
         ArrayList<String> label = new ArrayList<>();
         for (int i = 0; i < cryptoCurrencies.size(); i++)
             label.add(cryptoCurrencies.get(i).getTime().substring(0,10));
-//        for (int i = 0; i < expectedPrices.size(); i++)
-//            label.add(expectedPrices.get(i).getTime().substring(2));
         return label;
     }
 
+    //chart configuration (overall structure)
     void drawLineChart()
     {
         XAxis xAxis = chart.getXAxis();
@@ -341,9 +359,9 @@ public class PredictionFragment extends Fragment {
         feedMultiple();
     }
 
+    //chart design configuration (blue graph)
     private LineDataSet createBlueSet(LineDataSet set)
     {
-//        LineDataSet set = new LineDataSet(null, "Real Price");
         set.setAxisDependency(YAxis.AxisDependency.LEFT);
         set.setColor(ColorTemplate.getHoloBlue());
         set.setLineWidth(4f);
@@ -356,6 +374,7 @@ public class PredictionFragment extends Fragment {
         return set;
     }
 
+    //chart design configuration (red graph)
     private LineDataSet createRedSet(LineDataSet set)
     {
         set.setAxisDependency(YAxis.AxisDependency.LEFT);
@@ -370,6 +389,7 @@ public class PredictionFragment extends Fragment {
         return set;
     }
 
+    //chart design configuration (green graph)
     private LineDataSet createGreenSet(LineDataSet set)
     {
         set.setAxisDependency(YAxis.AxisDependency.LEFT);
@@ -378,14 +398,14 @@ public class PredictionFragment extends Fragment {
         set.setCircleRadius(5);
         set.setCircleHoleColor(Color.parseColor("#00804b"));
         set.setCircleColor(Color.parseColor("#00804b"));
-//        set.setFillAlpha(95);
         set.setColor(Color.parseColor("#00804b"));
-//        set.setHighLightColor(Color.rgb(244,177,177));
         set.setHighlightLineWidth(1.5f);
         set.setDrawValues(true);
         return set;
     }
 
+
+    //search data for the blue graph (actual price)
     void searchRealPrice(String name)
     {
         getActivity().runOnUiThread(new Runnable() {
@@ -394,12 +414,14 @@ public class PredictionFragment extends Fragment {
                 dialog.show();
             }
         });
+
         String crypto = name.toLowerCase(Locale.ROOT);
         if(crypto.equals("ethereum"))
             crypto = "etherium";
+
+        //send HTTP request to server
         OkHttpClient client = new OkHttpClient.Builder().connectTimeout(20, TimeUnit.SECONDS).writeTimeout(20, TimeUnit.SECONDS).readTimeout(20, TimeUnit.SECONDS).build();
         HttpUrl.Builder urlBuilder;
-//        urlBuilder = HttpUrl.parse("https://jongseol-crypto.herokuapp.com/real/"+ num + "/"+crypto).newBuilder();
         urlBuilder = HttpUrl.parse("http://3.39.61.211:8080/real/"+ 2 + "/"+crypto).newBuilder();
         String url = urlBuilder.build().toString();
         Request req = new Request.Builder().url(url).build();
@@ -416,6 +438,7 @@ public class PredictionFragment extends Fragment {
                 });
             }
 
+            //get HTTP response from server
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 final String myResponse = response.body().string();
@@ -450,21 +473,25 @@ public class PredictionFragment extends Fragment {
                 searchPrice(name);
             }
         });
-
     }
+
+    //search data for the red graph (predicted price)
     void searchPrice(String name)
     {
         String crypto = name.toLowerCase(Locale.ROOT);
         if(crypto.equals("ethereum"))
             crypto = "etherium";
+
+        //send HTTP request to server
         OkHttpClient client = new OkHttpClient.Builder().build();
         HttpUrl.Builder urlBuilder;
-//        urlBuilder = HttpUrl.parse("https://jongseol-crypto.herokuapp.com/"+crypto).newBuilder();
         urlBuilder = HttpUrl.parse("http://3.39.61.211:8080/"+crypto).newBuilder();
         String url = urlBuilder.build().toString();
 
         Request req = new Request.Builder().url(url).build();
         client.newCall(req).enqueue(new Callback() {
+
+            //get HTTP response from server
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 final String myResponse = response.body().string();
@@ -482,7 +509,7 @@ public class PredictionFragment extends Fragment {
                             }
                         });
                     }
-                    drawLineChart();
+                    drawLineChart();  //start to draw a line chart
                     tomorrowPrice = expectedPrices.get(expectedPrices.size()-1).getPrice();
                     getActivity().runOnUiThread(new Runnable() {
                         @Override

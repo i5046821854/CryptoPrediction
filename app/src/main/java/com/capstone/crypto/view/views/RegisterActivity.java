@@ -22,39 +22,28 @@ import com.capstone.crypto.view.utils.DBHelper;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    EditText idTxt;
-    EditText pwdTxt;
-    EditText nicknameTxt;
-    Button validCheckBtn;
-    Button chooseBtn;
-    Button signupBtn;
-    Button profileBtn;
-    int idFlag = 0;
-    int preference = -1;
-    String preferenceTxt;
-    DBHelper helper;
-    SQLiteDatabase db;
-    String confirmed;
-    int imgIdx = 0;
-
-    void initView(){
-        idTxt = findViewById(R.id.idRegTxt);
-        pwdTxt = findViewById(R.id.pwdRegTxt);
-        nicknameTxt = findViewById(R.id.nicknameEditTxt);
-        validCheckBtn = findViewById(R.id.idCheckBtn);
-        chooseBtn = findViewById(R.id.jobBtn);
-        signupBtn = findViewById(R.id.singupBtn);
-        profileBtn = findViewById(R.id.profileBtn);
-        helper = new DBHelper(RegisterActivity.this, "newdb.db", null, 1);
-        db = helper.getWritableDatabase();
-    }
+    private EditText idTxt;
+    private EditText pwdTxt;
+    private EditText nicknameTxt;
+    private Button validCheckBtn;
+    private Button chooseBtn;
+    private Button signupBtn;
+    private Button profileBtn;
+    private int idFlag = 0;
+    private int preference = -1;
+    private String preferenceTxt;
+    private DBHelper helper;
+    private SQLiteDatabase db;
+    private String confirmed;
+    private int imgIdx = 0;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register_layout);
-        initView();
+        initVar();  //initialize variables for components
 
+        //make image dialog for selecting profile picture
         profileBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -91,6 +80,7 @@ public class RegisterActivity extends AppCompatActivity {
         });
 
 
+        //ID duplication checkup logic
         validCheckBtn.setOnClickListener(view -> {
             String id = idTxt.getText().toString();
             Cursor cursor = db.rawQuery("SELECT * FROM USERS WHERE username = '" + id + "'", null);
@@ -109,6 +99,7 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
+        //dialog for crypto type preference selection
         chooseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -144,8 +135,10 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
+
+        //signup button handler
         signupBtn.setOnClickListener(view -> {
-            if(idFlag == 0)
+            if(idFlag == 0)  //if ID duplication checkup hasn't been done yet, user cannot make a account
             {
                 RegisterActivity.this.runOnUiThread(new Runnable() {
                     @Override
@@ -156,7 +149,7 @@ public class RegisterActivity extends AppCompatActivity {
                     }
                 });
             }
-            else{
+            else{  //make a new account and move intent to loginActivity
                 preference = (preference == -1? 1 : preference);
                 ContentValues cv = new ContentValues();
                 cv.put("username", confirmed);
@@ -171,5 +164,19 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
     }
+
+    //initailize variables
+    void initVar(){
+        idTxt = findViewById(R.id.idRegTxt);
+        pwdTxt = findViewById(R.id.pwdRegTxt);
+        nicknameTxt = findViewById(R.id.nicknameEditTxt);
+        validCheckBtn = findViewById(R.id.idCheckBtn);
+        chooseBtn = findViewById(R.id.jobBtn);
+        signupBtn = findViewById(R.id.singupBtn);
+        profileBtn = findViewById(R.id.profileBtn);
+        helper = new DBHelper(RegisterActivity.this, "newdb.db", null, 1);
+        db = helper.getWritableDatabase();
+    }
+
 
 }

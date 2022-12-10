@@ -97,60 +97,39 @@ public class HomeFragment extends Fragment {
     private RadioGroup radioGroup;
     private int checkNum;
     private ImageView datePickerBtn;
-    int i = 0;
-    int j = 0;
-    int size1 = 0;
+    private int size1 = 0;
     public static List<CryptoPrice> cryptoCurrencies;
     public static List<ExpectedPrice> expectedPrices;
     private ArrayList<News> newsList;
     private ResponseModel responseModel;
-    Context context;
+    private Context context;
     public List<CryptoPrice> getCryptoCurrencies() {
         return cryptoCurrencies;
     }
-
     public List<ExpectedPrice> getExpectedPrices() {
         return expectedPrices;
     }
+    int i = 0;
+    int j = 0;
 
-
-    int getIdx(String year, String month, String day) throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        Date d1 = sdf.parse(year+month+day);
-        for(int i = 0 ; i < size1; i++){
-            CryptoPrice crypto = cryptoCurrencies.get(i);
-            Date d2 = sdf.parse(crypto.getTime().substring(0,4)+crypto.getTime().substring(5,7)+crypto.getTime().substring(8,10));
-            if(d1.equals(d2))
-                return i;
-            else if(d2.after(d1))
-                return i-1;
-        }
-        return -1;
-    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         context = container.getContext();
-        searchBtn = view.findViewById(R.id.searchBtn2);
-        cryptoTxt = view.findViewById(R.id.searchBox);
-        radioGroup = view.findViewById(R.id.radioGroup);
-        openTxt = view.findViewById(R.id.openTxt);
-        dateLbl = view.findViewById(R.id.dateLbl);
-        closeTxt= view.findViewById(R.id.closeTxt);
-        lowTxt = view.findViewById(R.id.lowTxt);
-        datePickerBtn = view.findViewById(R.id.button);
-        highTxt = view.findViewById(R.id.highTxt);
-        volumeTxt = view.findViewById(R.id.volTxt);
-        chart = view.findViewById(R.id.bar);
 
+        // Initializez Variables
+        initVars(view, container);
+
+        // Make a dialog to make user wait for the processing of the data
         dialog = new ProgressDialog(context);
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.setMessage("Data being processed...");
 
         initView();
 
+        // Initialize DateSetListener for DatePicker Dialog
         DatePickerDialog.OnDateSetListener d = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int day){
@@ -177,6 +156,7 @@ public class HomeFragment extends Fragment {
         };
 
 
+        // Make a dialog for selecting specific date of price
         datePickerBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
@@ -185,6 +165,8 @@ public class HomeFragment extends Fragment {
                 pd.show(getFragmentManager(), "Year Month Picker");
             }
         });
+
+        // Search another type of cryptocurrency
         searchBtn.setOnClickListener(tempView -> {
             newsList = new ArrayList<>();
             String crypto = cryptoTxt.getText().toString();
@@ -195,6 +177,8 @@ public class HomeFragment extends Fragment {
             chart.moveViewToX(size1-1);
 
         });
+
+        // Switch Configuration for change the time interval of the graph
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int i) {
@@ -217,6 +201,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        // Event Handler when a certain point on a graph is selected
         chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
@@ -233,15 +218,49 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
+     void initVars(View view, ViewGroup container) {
+         searchBtn = view.findViewById(R.id.searchBtn2);
+         cryptoTxt = view.findViewById(R.id.searchBox);
+         radioGroup = view.findViewById(R.id.radioGroup);
+         openTxt = view.findViewById(R.id.openTxt);
+         dateLbl = view.findViewById(R.id.dateLbl);
+         closeTxt= view.findViewById(R.id.closeTxt);
+         lowTxt = view.findViewById(R.id.lowTxt);
+         datePickerBtn = view.findViewById(R.id.button);
+         highTxt = view.findViewById(R.id.highTxt);
+         volumeTxt = view.findViewById(R.id.volTxt);
+         chart = view.findViewById(R.id.bar);
+
+     }
+
+    //return index of the specific date in the graph
+    int getIdx(String year, String month, String day) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        Date d1 = sdf.parse(year+month+day);
+        for(int i = 0 ; i < size1; i++){
+            CryptoPrice crypto = cryptoCurrencies.get(i);
+            Date d2 = sdf.parse(crypto.getTime().substring(0,4)+crypto.getTime().substring(5,7)+crypto.getTime().substring(8,10));
+            if(d1.equals(d2))
+                return i;
+            else if(d2.after(d1))
+                return i-1;
+        }
+        return -1;
+    }
+
+    //change price information at the bottom of a page
     void changeBottom(float x){
-        if((int)x == -1)
+
+        if((int)x == -1)  //invalid index
             return;
+
         CryptoPrice crypto = cryptoCurrencies.get((int)x);
         CryptoPrice prev = cryptoCurrencies.get((int)x - 1);
         BigDecimal open = new BigDecimal(crypto.getOpen());
         BigDecimal close = new BigDecimal(crypto.getClose());
         BigDecimal high = new BigDecimal(crypto.getHigh());
         BigDecimal low = new BigDecimal(crypto.getLow());
+
         openTxt.setText(open.toString());
         closeTxt.setText(close.toString());
         lowTxt.setText(low.toString());
@@ -249,6 +268,8 @@ public class HomeFragment extends Fragment {
         volumeTxt.setText(Float.toString(crypto.getVolume()));
         dateLbl.setText("As of "+ crypto.getTime().substring(0,10));
         dateLbl.setTextColor(Color.BLACK);
+
+        //set text color ; RED for incline / BLUE for decline
         if(crypto.getOpen() >= prev.getOpen())
             openTxt.setTextColor(Color.RED);
         else
@@ -274,6 +295,8 @@ public class HomeFragment extends Fragment {
         else
             volumeTxt.setTextColor(Color.BLUE);
     }
+
+    //initialize variables
     void initView()
     {
         ChartMaker marker = new ChartMaker(context,R.layout.chart_maker);
@@ -284,9 +307,9 @@ public class HomeFragment extends Fragment {
         searchRealPrice(name, choosed);
     }
 
-
+    //add entries to the graph
     void addEntry(int numberOfChart) {
-        LineData lineData = chart.getData();
+
         ArrayList<Entry> data1 = new ArrayList<Entry>();
         i = 0;
         while (true) {
@@ -297,16 +320,19 @@ public class HomeFragment extends Fragment {
             data1.add(new Entry(i, (float) cryptoCurrencies.get(i).getClose()));
             i++;
         }
+
+        //make dataset with the ArrayList
         LineDataSet dataset1 = new LineDataSet(data1, "actual");
         dataset1 = createBlueSet(dataset1);
         ArrayList<ILineDataSet> lines = new ArrayList<ILineDataSet>();
         lines.add(dataset1);
 
-        chart.setData(new LineData(lines));
-        chart.setVisibleXRangeMaximum(size1 / 2);
-        chart.moveViewToX(data1.size());
+        chart.setData(new LineData(lines));  //add dataset to the chart
+        chart.setVisibleXRangeMaximum(size1 / 2);  //set default range of visible range
+        chart.moveViewToX(data1.size()); //set default starting point
     }
 
+    //make a dataset via multithreading
     void feedMultiple(int numberOfChart)
     {
         if(thread != null)
@@ -326,6 +352,7 @@ public class HomeFragment extends Fragment {
         thread.start();
     }
 
+    //set the name of x-axis
     public ArrayList<String> getAreaCount() {
         ArrayList<String> label = new ArrayList<>();
             for (int i = 0; i < cryptoCurrencies.size(); i++)
@@ -333,6 +360,7 @@ public class HomeFragment extends Fragment {
         return label;
     }
 
+    //chart configuration (overall structure)
     void drawLineChart(int numberOfChart)
     {
         XAxis xAxis = chart.getXAxis();
@@ -349,9 +377,9 @@ public class HomeFragment extends Fragment {
         feedMultiple(numberOfChart);
     }
 
+    //chart configuration (design)
     private LineDataSet createBlueSet(LineDataSet set)
     {
-//        LineDataSet set = new LineDataSet(null, "Real Price");
         set.setAxisDependency(YAxis.AxisDependency.LEFT);
         set.setColor(ColorTemplate.getHoloBlue());
         set.setLineWidth(4f);
@@ -364,6 +392,8 @@ public class HomeFragment extends Fragment {
         return set;
     }
 
+
+    //search price of crypto
     void searchRealPrice(String name, int num)
     {
         getActivity().runOnUiThread(new Runnable() {
@@ -372,26 +402,22 @@ public class HomeFragment extends Fragment {
                 dialog.show();
             }
         });
+
         String crypto = name.toLowerCase(Locale.ROOT);
         if(crypto.equals("ethereum"))
             crypto = "etherium";
+
         OkHttpClient client = new OkHttpClient.Builder().connectTimeout(20, TimeUnit.SECONDS).writeTimeout(20, TimeUnit.SECONDS).readTimeout(20, TimeUnit.SECONDS).build();
         HttpUrl.Builder urlBuilder;
-//        urlBuilder = HttpUrl.parse("https://jongseol-crypto.herokuapp.com/real/"+ num + "/"+crypto).newBuilder();
         urlBuilder = HttpUrl.parse("http://3.39.61.211:8080/real/"+ num + "/"+crypto).newBuilder();
         String url = urlBuilder.build().toString();
         Request req = new Request.Builder().url(url).build();
+
+        //send request to server
         client.newCall(req).enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 System.out.println(e.toString());
-
-//                getActivity().runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
-//                    }
-//                });
             }
 
             @Override
@@ -403,6 +429,8 @@ public class HomeFragment extends Fragment {
                         .fromJson( myResponse , collectionType);
                 curPrice = cryptoCurrencies.get(cryptoCurrencies.size()-1);
                 size1 = cryptoCurrencies.size();
+
+                //renew price information
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -410,6 +438,7 @@ public class HomeFragment extends Fragment {
                         BigDecimal close = new BigDecimal(curPrice.getClose());
                         BigDecimal high = new BigDecimal(curPrice.getHigh());
                         BigDecimal low = new BigDecimal(curPrice.getLow());
+
                         openTxt.setText(open.toString());
                         closeTxt.setText(close.toString());
                         lowTxt.setText(low.toString());
@@ -417,69 +446,13 @@ public class HomeFragment extends Fragment {
                         volumeTxt.setText(Float.toString(curPrice.getVolume()));
                         dateLbl.setText("As of "+ curPrice.getTime().substring(0,10));
                         cryptoTxt.setText(name);
-
                     }
                 });
                 drawLineChart(1);
                 dialog.dismiss();
             }
         });
-
     }
-    void searchPrice(String name, int num)
-    {
-        String crypto = name.toLowerCase(Locale.ROOT);
-        if(crypto.equals("ethereum"))
-            crypto = "etherium";
-        OkHttpClient client = new OkHttpClient.Builder().build();
-        HttpUrl.Builder urlBuilder;
-//        urlBuilder = HttpUrl.parse("https://jongseol-crypto.herokuapp.com/"+crypto).newBuilder();
-        urlBuilder = HttpUrl.parse("http://3.39.61.211:8080/"+crypto).newBuilder();
-        String url = urlBuilder.build().toString();
-        Request req = new Request.Builder().url(url).build();
-        client.newCall(req).enqueue(new Callback() {
-            @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                final String myResponse = response.body().string();
-                Gson gson = new GsonBuilder().create();
-                Type collectionType = new TypeToken<List<ExpectedPrice>>(){}.getType();
-                try{
-                    expectedPrices = (List<ExpectedPrice>) new Gson()
-                            .fromJson( myResponse , collectionType);
-                    if(expectedPrices.size() == 0)
-                    {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(context, "해당하는 가상화폐가 존재하지 않습니다", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-                    drawLineChart(2);
-                    dialog.dismiss();
-//                    searchRealPrice(name, num);
-                }catch (JsonSyntaxException e)
-                {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(context, "Invalid Name of the Cryptocurrency", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-            }
 
-            @Override
-            public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                System.out.println(e.toString());
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
-                    }
-                });                }
-
-        });
-    }
 
 }
