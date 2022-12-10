@@ -25,24 +25,21 @@
         android:id="@+id/singupBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:fontFamily="serif"
         android:text="SIGN UP"
         android:textSize="17sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.491"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/jobBtn"
+        app:layout_constraintTop_toBottomOf="@+id/profileBtn"
         app:layout_constraintVertical_bias="0.483" />
 
     <Button
         android:id="@+id/idCheckBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="serif"
         android:text="Validity Check"
-        android:textSize="10sp"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="@+id/idRegTxt"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.475"
@@ -55,7 +52,7 @@
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         android:ems="10"
         android:fontFamily="serif"
         android:inputType="textPersonName"
@@ -67,7 +64,7 @@
         android:id="@+id/pwdRegTxt"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         android:ems="10"
         android:fontFamily="serif"
         android:inputType="textPassword"
@@ -88,8 +85,7 @@
         android:id="@+id/jobBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:fontFamily="serif"
+        android:layout_marginTop="10dp"
         android:text="Choose Type of Crypto!"
         android:textSize="15sp"
         app:layout_constraintStart_toStartOf="@+id/textView4"
@@ -100,13 +96,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
-        android:layout_marginTop="50dp"
         android:fontFamily="serif"
         android:text="ID"
         android:textColor="#131313"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/myPageLbl" />
+        app:layout_constraintTop_toTopOf="@+id/guideline20" />
 
     <TextView
         android:id="@+id/textView2"
@@ -124,13 +119,12 @@
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
         android:fontFamily="serif"
         android:text="Preferred Cryptocurrency"
         android:textColor="#131313"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="@+id/nicknameEditTxt"
-        app:layout_constraintTop_toBottomOf="@+id/nicknameEditTxt" />
+        app:layout_constraintTop_toTopOf="@+id/guideline23" />
 
     <TextView
         android:id="@+id/textView5"
@@ -143,5 +137,66 @@
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="@+id/pwdRegTxt"
         app:layout_constraintTop_toBottomOf="@+id/pwdRegTxt" />
+
+    <TextView
+        android:id="@+id/textView11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="serif"
+        android:text="Profile Picture"
+        android:textColor="#131313"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="@+id/textView4"
+        app:layout_constraintTop_toTopOf="@+id/guideline24" />
+
+    <Button
+        android:id="@+id/profileBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Choose Picture"
+        android:textSize="15sp"
+        app:layout_constraintStart_toStartOf="@+id/textView11"
+        app:layout_constraintTop_toBottomOf="@+id/textView11" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline20"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.15" />
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline21"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.3" />
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline22"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.45" />
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline23"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.6" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline24"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.75" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

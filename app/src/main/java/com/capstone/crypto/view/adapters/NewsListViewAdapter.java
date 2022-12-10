@@ -17,7 +17,7 @@ import com.capstone.crypto.view.model.News;
 import java.util.ArrayList;
 import java.util.List;
 
-
+//list view to hold all the articles
 public class NewsListViewAdapter extends BaseAdapter {
 
     private Context mContext;
@@ -46,17 +46,6 @@ public class NewsListViewAdapter extends BaseAdapter {
         return i;
     }
 
-    public final static String EXT_TITLE = "TITLE";
-    public final static String EXT_DESC = "DESC";
-    public final static String EXT_URL = "URL";
-    public final static String EXT_AUTHOR = "AUTHOR";
-    public final static String EXT_IMAGE = "IMAGE";
-    public final static String EXT_LANG = "LANG";
-    public final static String EXT_CATEGORY = "CATEGORY";
-    public final static String EXT_PUBLISHED = "PUBLISHED";
-
-
-
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
@@ -65,13 +54,12 @@ public class NewsListViewAdapter extends BaseAdapter {
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(R.layout.news_listview, viewGroup, false);
         }
-        System.out.println("tqweqwe");
+
         TextView titleTxt  = (TextView)view.findViewById(R.id.titleTxt2);
         readFullBtn = (Button)view.findViewById(R.id.detailBtn);
         TextView dateTxt = view.findViewById(R.id.dateTxt);
-        Integer id = items.get(i).getArticleId();
-//        String author = (items.get(i).getAuthor() == null)? " " : items.get(i).getAuthor();
         String title = (items.get(i).getTitle() == null)? " ": items.get(i).getTitle();
+
         if(this.type == 2) {
             dateTxt.setText(items.get(i).getDate());
             if(title.length() > 30){
@@ -80,13 +68,14 @@ public class NewsListViewAdapter extends BaseAdapter {
         }
         else
         {
-            if(title.length() > 25){
+            if(title.length() > 25){  //show title just 25 character because space is limited
                 title = title.substring(0, 25);
             }
             dateTxt.setVisibility(View.GONE);
         }
         titleTxt.setText(title);
-        //authorTxt.setText(author);
+
+        //when user clicks "FULL" button, then links to the web page that holds original articles
         readFullBtn.setOnClickListener(tempView ->{
             Intent redirect = new Intent(Intent.ACTION_VIEW, Uri.parse(items.get(i).getSrc()));
             mContext.startActivity(redirect.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));

@@ -31,46 +31,41 @@ public class MenuActivity extends AppCompatActivity {
     private Bundle bundle;
     private int img;
     private BottomNavigationView bottomNavigationView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
         Intent intent = getIntent();
-        preference = intent.getStringExtra("name");
-        userId = intent.getStringExtra("id");
-        nickname = intent.getStringExtra("nickname");
-        img = intent.getIntExtra("img", 1);
-        System.out.println(img);
-        System.out.println("userID : " + userId);
-        bundle= new Bundle();
-        bundle.putString("preference", preference);
-        bundle.putString("id", userId);
-        bundle.putInt("img", img);
-        bundle.putString("nickname", nickname);
+        initVars(intent); //initialize variables
+
+        //index fragment : home
         homeFragment.setArguments(bundle);
         fragmentManager.beginTransaction().replace(R.id.menu_frame_layout, homeFragment).commitAllowingStateLoss();
+
+        //initailize bottomNavigationView
         bottomNavigationView = findViewById(R.id.bottom_menu);
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
-                    case R.id.home:
+                    case R.id.home:  //home frag
                         homeFragment.setArguments(bundle);
                         getSupportFragmentManager().beginTransaction().replace(R.id.menu_frame_layout, homeFragment).commitAllowingStateLoss();
                         return true;
-                    case R.id.prediction:
+                    case R.id.prediction: //prediction frag
                         predictionFragment.setArguments(bundle);
                         getSupportFragmentManager().beginTransaction().replace(R.id.menu_frame_layout, predictionFragment).commitAllowingStateLoss();
                         return true;
-                    case R.id.chat:
+                    case R.id.chat: //chat frag
                         chatFragment.setArguments(bundle);
                         getSupportFragmentManager().beginTransaction().replace(R.id.menu_frame_layout, chatFragment).commitAllowingStateLoss();
                         return true;
-                    case R.id.info:
+                    case R.id.info: //info frag
                         mypageFragment.setArguments(bundle);
                         getSupportFragmentManager().beginTransaction().replace(R.id.menu_frame_layout, mypageFragment).commitAllowingStateLoss();
                         return true;
-                    case R.id.news:
+                    case R.id.news: //new frag
                         newsFragment.setArguments(bundle);
                         getSupportFragmentManager().beginTransaction().replace(R.id.menu_frame_layout, newsFragment).commitAllowingStateLoss();
                         return true;
@@ -87,29 +82,40 @@ public class MenuActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    //when user press other menu, go to that selected menu
     public void changeFrag(int idx ,Bundle newBundle){
         if(idx == 1){ //to home
             bottomNavigationView.getMenu().getItem(0).setChecked(true);
             bundle = newBundle;
             homeFragment.setArguments(bundle);
-            System.out.println(bundle.getString("preference"));
             getSupportFragmentManager().beginTransaction().replace(R.id.menu_frame_layout, homeFragment).commitAllowingStateLoss();
         }else if(idx == 2){  //to Mypage
             bottomNavigationView.getMenu().getItem(4).setChecked(true);
             mypageFragment.setArguments(bundle);
             getSupportFragmentManager().beginTransaction().replace(R.id.menu_frame_layout, mypageFragment).commitAllowingStateLoss();
-        }else if(idx == 3){
+        }else if(idx == 3){  //to chat
             bottomNavigationView.getMenu().getItem(3).setChecked(true);
             chatFragment.setArguments(bundle);
-            System.out.println("called!");
             getSupportFragmentManager().beginTransaction().replace(R.id.menu_frame_layout, chatFragment).commitAllowingStateLoss();
         }
-        else if(idx == 4){
+        else if(idx == 4){  //to news
             bottomNavigationView.getMenu().getItem(2).setChecked(true);
             chatFragment.setArguments(bundle);
-            System.out.println("called!");
-            getSupportFragmentManager().beginTransaction().replace(R.id.menu_frame_layout, chatFragment).commitAllowingStateLoss();
+            getSupportFragmentManager().beginTransaction().replace(R.id.menu_frame_layout, newsFragment).commitAllowingStateLoss();
         }
+    }
+
+    //initailize variables
+    void initVars(Intent intent){
+        preference = intent.getStringExtra("name");
+        userId = intent.getStringExtra("id");
+        nickname = intent.getStringExtra("nickname");
+        img = intent.getIntExtra("img", 1);
+        bundle= new Bundle();
+        bundle.putString("preference", preference);
+        bundle.putString("id", userId);
+        bundle.putInt("img", img);
+        bundle.putString("nickname", nickname);
     }
 
 }

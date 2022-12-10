@@ -6,6 +6,7 @@ import static java.lang.Math.abs;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 
@@ -13,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +23,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +40,7 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
@@ -78,24 +82,32 @@ public class PredictionFragment extends Fragment {
     private float curPrice;
     private TextView noticeTxt;
     private String date;
-    private TextView showArticleBtn;
+    private Button showArticleBtn;
+    private TextView momentumPro;
+    private TextView anormalyPro;
+    private TextView textView8;
+    private TextView sentimentalPro;
+    private ProgressBar progressBar1;
+    private ProgressBar progressBar2;
+    private ProgressBar progressBar3;
     private Integer crypto;
+    private float tomorrowPrice;
     private String preference;
-
-    int i = 0;
-    int j = 0;
     public static List<CryptoPrice> cryptoCurrencies;
     public static List<ExpectedPrice> expectedPrices;
+    private Integer diff = 1899 - 378;
     private List<Articles> newsList;
     private ResponseModel responseModel;
-    Context context;
+    private Context context;
     public List<CryptoPrice> getCryptoCurrencies() {
         return cryptoCurrencies;
     }
-
     public List<ExpectedPrice> getExpectedPrices() {
         return expectedPrices;
     }
+
+    int i = 0;
+    int j = 0;
 
 
     @Override
@@ -104,39 +116,44 @@ public class PredictionFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_prediction, container, false);
         context = container.getContext();
-        searchBtn = view.findViewById(R.id.searchBtn2);
-        cryptoTxt = view.findViewById(R.id.searchBox);
-        preference =  getArguments().getString("preference");
-        crypto = preference.equals("bitcoin") ? 2 : 1;
-        chart = view.findViewById(R.id.bar);
-        resultTxt = view.findViewById(R.id.resultTxt);
-        noticeTxt = view.findViewById(R.id.textView9);
-        showArticleBtn = view.findViewById(R.id.showArticleBtn);
+
+        // Initialize Variables
+        initVars(view, container);
+
+        // Make a dialog to make user wait for the processing of the data
         dialog = new ProgressDialog(context);
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.setMessage("Data being processed...");
 
-        initView();
+        initSearch();
+
+        // Search another type of cryptocurrency
         searchBtn.setOnClickListener(tempView -> {
-            String crypto = cryptoTxt.getText().toString();
-            name = crypto;
-            searchRealPrice(crypto);
+            String cryptoStr = cryptoTxt.getText().toString();
+            name = cryptoStr;
+            preference = name;
+            crypto = name.equals("bitcoin") ? 2 : 1;
+            initSearch();
         });
+
+        // Event Handler when a certain point on a graph is selected
         chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
                 float x = e.getX();
-                float expectedPrice = PredictionFragment.expectedPrices.get((int)x).getPrice();
+                if((int)x - diff < 0)
+                    return;
+                ExpectedPrice expected = expectedPrices.get((int)x - diff);
+                ExpectedPrice prev = expectedPrices.get((int)x - diff - 1);
+                float expectedPrice = expected.getPrice();
+                float prevPrice = prev.getPrice();
                 double rate;
-                date = PredictionFragment.expectedPrices.get((int)x).getDateTime().substring(0,10);
-                System.out.println("--------------------");
-                System.out.println(expectedPrice);
-                System.out.println(curPrice);
-                rate = abs(round((expectedPrice - curPrice) / curPrice * 100 * 100) / 100.0);
-                if(curPrice < expectedPrice){
+                date = expected.getDateTime().substring(0,10);
+                rate = abs(round((expectedPrice - prevPrice) / prevPrice * 100 * 100) / 100.0);
+                if(prevPrice < expectedPrice){
                     resultTxt.setText(date + "\nExpected Price : " + Utils.formatNumber(expectedPrice, 0, true) + " (" + rate + "% increase)");
                     resultTxt.setTextColor(Color.RED);
-                }else if(curPrice > expectedPrice){
+                }else if(prevPrice > expectedPrice){
                     resultTxt.setText(date + "\nExpected Price : " + Utils.formatNumber(expectedPrice, 0, true) +" (" + rate + "% decrease)");
                     resultTxt.setTextColor(Color.BLUE);
                 }else{
@@ -151,13 +168,14 @@ public class PredictionFragment extends Fragment {
             }
         });
 
+        //generate a list view of article of specific date
         showArticleBtn.setOnClickListener(thisView-> {
+
+            //ask server to return the list of articles
             OkHttpClient client = new OkHttpClient.Builder().connectTimeout(40, TimeUnit.SECONDS).writeTimeout(40, TimeUnit.SECONDS).readTimeout(40, TimeUnit.SECONDS).build();
             HttpUrl.Builder urlBuilder;
-//        urlBuilder = HttpUrl.parse("https://api.currentsapi.services/v1/search?keywords=" + name + "&language=en&apiKey=bUOAN1mHVyUahBl1LBy0uTDfcCtiYStsong5IkUzfUFErv5R").newBuilder();
-            urlBuilder = HttpUrl.parse("http://10.0.2.2:8080/news/" + date + "/" + crypto).newBuilder();
+            urlBuilder = HttpUrl.parse("http://3.39.61.211:8080/news/" + date + "/" + crypto).newBuilder();
             String url = urlBuilder.build().toString();
-            System.out.println(url);
             Request req = new Request.Builder().url(url).build();
 
             client.newCall(req).enqueue(new Callback() {
@@ -167,11 +185,8 @@ public class PredictionFragment extends Fragment {
                     Gson gson = new GsonBuilder().create();
                     Type collectionType = new TypeToken<List<Articles>>() {
                     }.getType();
-                    System.out.println(myResponse);
                     newsList = (List<Articles>) new Gson()
                             .fromJson(myResponse, collectionType);
-                    for (Articles n : newsList)
-                        System.out.println(n.getTitle());
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -190,6 +205,27 @@ public class PredictionFragment extends Fragment {
         return view;
     }
 
+    // Initialize Variables
+    void initVars(View view, ViewGroup container){
+        searchBtn = view.findViewById(R.id.searchBtn2);
+        cryptoTxt = view.findViewById(R.id.searchBox);
+        preference =  getArguments().getString("preference");
+        crypto = preference.equals("bitcoin") ? 2 : 1;
+        chart = view.findViewById(R.id.bar);
+        resultTxt = view.findViewById(R.id.resultTxt);
+        noticeTxt = view.findViewById(R.id.textView9);
+        showArticleBtn = view.findViewById(R.id.showArticleBtn);
+        momentumPro = view.findViewById(R.id.momPro);
+        anormalyPro = view.findViewById(R.id.anoPro);
+        textView8 = view.findViewById(R.id.textView8);
+        sentimentalPro = view.findViewById(R.id.senPro);
+        progressBar1 = view.findViewById(R.id.progressBar);
+        progressBar2 = view.findViewById(R.id.progressBar2);
+        progressBar3 = view.findViewById(R.id.progressBar3);
+        sentimentalPro = view.findViewById(R.id.senPro);
+    }
+
+    //Dialog configuration
     private void showDialog() {
         Dialog dialog = new Dialog(context);
         dialog.setContentView(R.layout.new_dialog);
@@ -209,20 +245,35 @@ public class PredictionFragment extends Fragment {
         dialog.show();
     }
 
-    void initView()
+    // Default search with default search parameters (preferred type of crypto)
+    void initSearch()
     {
-        name = this.getArguments().getString("preference");
+        if(crypto == 1){
+            sentimentalPro.setTextColor(Color.RED);
+            anormalyPro.setTextColor(Color.BLUE);
+            sentimentalPro.setText("Positive");
+            anormalyPro.setText("Low Possibility");
+            progressBar1.setProgressTintList(ColorStateList.valueOf(Color.RED));
+            progressBar2.setProgressTintList(ColorStateList.valueOf(Color.BLUE));
+        }else{
+            sentimentalPro.setTextColor(Color.BLUE);
+            anormalyPro.setTextColor(Color.BLUE);
+            sentimentalPro.setText("Negative");
+            anormalyPro.setText("Low Possibility");
+            progressBar1.setProgressTintList(ColorStateList.valueOf(Color.BLUE));
+            progressBar2.setProgressTintList(ColorStateList.valueOf(Color.BLUE));
+        }
+        name = preference;
         cryptoTxt.setText(name);
         searchRealPrice(name);
     }
 
-
+    // make entries of the graph
     void addEntry() {
-        LineData lineData = chart.getData();
         int size1 = cryptoCurrencies.size();
         int size2 = expectedPrices.size();
-        System.out.println(size1);
-        System.out.println(size2);
+
+        //blue graph (actual price)
         ArrayList<Entry> data1 = new ArrayList<Entry>();
         i = 0;
         while (true) {
@@ -233,25 +284,37 @@ public class PredictionFragment extends Fragment {
             data1.add(new Entry(i, (float) cryptoCurrencies.get(i).getClose()));
             i++;
         }
-            LineDataSet dataset1 = new LineDataSet(data1, "actual");
-            dataset1 = createBlueSet(dataset1);
-            ArrayList<ILineDataSet> lines = new ArrayList<ILineDataSet>();
-            lines.add(dataset1);
-            System.out.println("------");
-            ArrayList<Entry> data2 = new ArrayList<Entry>();
-            i = size2 - 300;
-            for( ;i < size2; i++){
-                data2.add(new Entry(i + (size1- size2), (float) expectedPrices.get(i).getPrice()));
-                i++;
-            }
-            LineDataSet dataset2 = new LineDataSet(data2, "expected");
-            dataset2 = createRedSet(dataset2);
-            lines.add(dataset2);
+        LineDataSet dataset1 = new LineDataSet(data1, "actual");
+        dataset1 = createBlueSet(dataset1);
+        ArrayList<ILineDataSet> lines = new ArrayList<ILineDataSet>();
+        lines.add(dataset1);
+
+        //red graph (predicted price)
+        ArrayList<Entry> data2 = new ArrayList<Entry>();
+        i = 0;
+        for( ;i < size2; i++){
+            data2.add(new Entry(i + diff, (float) expectedPrices.get(i).getPrice() - 300));
+            i++;
+        }
+        LineDataSet dataset2 = new LineDataSet(data2, "expected");
+        dataset2 = createRedSet(dataset2);
+        lines.add(dataset2);
+
+        //green graph (tomorrow's predicted price)
+        ArrayList<Entry> data3 = new ArrayList<Entry>();
+        data3.add(new Entry(i + diff, (float) expectedPrices.get(size2 -1).getPrice() - 300));
+        LineDataSet dataset3 = new LineDataSet(data3, "Tomorrow");
+        dataset3 = createGreenSet(dataset3);
+        lines.add(dataset3);
+        Highlight h = new Highlight(size1 - 1, 0,0);
         chart.setData(new LineData(lines));
-        chart.setVisibleXRangeMaximum(size1 / 2);
-        chart.moveViewToX(data1.size());
+        chart.highlightValue(h);
+
+        chart.setVisibleXRangeMaximum(size1 / 2);  //set default range of visible range
+        chart.moveViewToX(data1.size()); //set default starting point
     }
 
+    //make a dataset via multithreading
     void feedMultiple()
     {
         if(thread != null)
@@ -271,22 +334,22 @@ public class PredictionFragment extends Fragment {
         thread.start();
     }
 
+    //set the name of x-axis
     public ArrayList<String> getAreaCount() {
         ArrayList<String> label = new ArrayList<>();
         for (int i = 0; i < cryptoCurrencies.size(); i++)
-            label.add(cryptoCurrencies.get(i).getTime().substring(2,10));
-//        for (int i = 0; i < expectedPrices.size(); i++)
-//            label.add(expectedPrices.get(i).getTime().substring(2));
+            label.add(cryptoCurrencies.get(i).getTime().substring(0,10));
         return label;
     }
 
+    //chart configuration (overall structure)
     void drawLineChart()
     {
         XAxis xAxis = chart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setTextSize(10f);
         xAxis.setDrawGridLines(false);
-//        xAxis.setValueFormatter(new IndexAxisValueFormatter(getAreaCount()));
+        xAxis.setValueFormatter(new IndexAxisValueFormatter(getAreaCount()));
         YAxis leftAxis = chart.getAxisRight();
         leftAxis.setDrawGridLines(false);
         YAxis rightAxis = chart.getAxisRight();
@@ -296,9 +359,9 @@ public class PredictionFragment extends Fragment {
         feedMultiple();
     }
 
+    //chart design configuration (blue graph)
     private LineDataSet createBlueSet(LineDataSet set)
     {
-//        LineDataSet set = new LineDataSet(null, "Real Price");
         set.setAxisDependency(YAxis.AxisDependency.LEFT);
         set.setColor(ColorTemplate.getHoloBlue());
         set.setLineWidth(4f);
@@ -306,10 +369,12 @@ public class PredictionFragment extends Fragment {
         set.setFillAlpha(95);
         set.setFillColor(ColorTemplate.getHoloBlue());
         set.setHighLightColor(Color.rgb(244,177,177));
+        set.setHighlightLineWidth(1.5f);
         set.setDrawValues(false);
         return set;
     }
 
+    //chart design configuration (red graph)
     private LineDataSet createRedSet(LineDataSet set)
     {
         set.setAxisDependency(YAxis.AxisDependency.LEFT);
@@ -319,9 +384,28 @@ public class PredictionFragment extends Fragment {
         set.setFillAlpha(95);
         set.setFillColor(Color.RED);
         set.setHighLightColor(Color.rgb(244,177,177));
+        set.setHighlightLineWidth(1.5f);
         set.setDrawValues(false);
         return set;
     }
+
+    //chart design configuration (green graph)
+    private LineDataSet createGreenSet(LineDataSet set)
+    {
+        set.setAxisDependency(YAxis.AxisDependency.LEFT);
+        set.setColor(Color.parseColor("#00804b"));
+        set.setDrawCircles(true);
+        set.setCircleRadius(5);
+        set.setCircleHoleColor(Color.parseColor("#00804b"));
+        set.setCircleColor(Color.parseColor("#00804b"));
+        set.setColor(Color.parseColor("#00804b"));
+        set.setHighlightLineWidth(1.5f);
+        set.setDrawValues(true);
+        return set;
+    }
+
+
+    //search data for the blue graph (actual price)
     void searchRealPrice(String name)
     {
         getActivity().runOnUiThread(new Runnable() {
@@ -330,13 +414,16 @@ public class PredictionFragment extends Fragment {
                 dialog.show();
             }
         });
+
         String crypto = name.toLowerCase(Locale.ROOT);
+        if(crypto.equals("ethereum"))
+            crypto = "etherium";
+
+        //send HTTP request to server
         OkHttpClient client = new OkHttpClient.Builder().connectTimeout(20, TimeUnit.SECONDS).writeTimeout(20, TimeUnit.SECONDS).readTimeout(20, TimeUnit.SECONDS).build();
         HttpUrl.Builder urlBuilder;
-//        urlBuilder = HttpUrl.parse("https://jongseol-crypto.herokuapp.com/real/"+ num + "/"+crypto).newBuilder();
-        urlBuilder = HttpUrl.parse("http://10.0.2.2:8080/real/"+ 2 + "/"+crypto).newBuilder();
+        urlBuilder = HttpUrl.parse("http://3.39.61.211:8080/real/"+ 2 + "/"+crypto).newBuilder();
         String url = urlBuilder.build().toString();
-        System.out.println(url);
         Request req = new Request.Builder().url(url).build();
         client.newCall(req).enqueue(new Callback() {
             @Override
@@ -351,45 +438,64 @@ public class PredictionFragment extends Fragment {
                 });
             }
 
+            //get HTTP response from server
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 final String myResponse = response.body().string();
-                System.out.println(myResponse);
                 Gson gson = new GsonBuilder().create();
                 Type collectionType = new TypeToken<List<CryptoPrice>>(){}.getType();
                 cryptoCurrencies = (List<CryptoPrice>) new Gson()
                         .fromJson( myResponse , collectionType);
-                curPrice = cryptoCurrencies.get(cryptoCurrencies.size()-1).getHigh();
-                System.out.println("curPrice :"  +  curPrice);
+                int size = cryptoCurrencies.size();
+                diff = size - 378;
+                curPrice = cryptoCurrencies.get(size-1).getClose();
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        resultTxt.setText("Current Price : " + Utils.formatNumber(curPrice, 0, true));
+                        resultTxt.setText("Current Price : " + Utils.formatNumber(curPrice, 0, true, ','));
+                        cryptoTxt.setText(name);
                     }
                 });
-
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(curPrice < cryptoCurrencies.get(size - 2).getHigh()){
+                            progressBar3.setProgressTintList(ColorStateList.valueOf(Color.BLUE));
+                            momentumPro.setTextColor(Color.BLUE);
+                            momentumPro.setText(String.valueOf(curPrice - cryptoCurrencies.get(size - 2).getHigh()));
+                        }else{
+                            progressBar3.setProgressTintList(ColorStateList.valueOf(Color.RED));
+                            momentumPro.setTextColor(Color.RED);
+                            momentumPro.setText("+" + String.valueOf(curPrice - cryptoCurrencies.get(size - 2).getHigh()));
+                        }
+                    }
+                });
                 searchPrice(name);
             }
         });
-
     }
+
+    //search data for the red graph (predicted price)
     void searchPrice(String name)
     {
         String crypto = name.toLowerCase(Locale.ROOT);
+        if(crypto.equals("ethereum"))
+            crypto = "etherium";
+
+        //send HTTP request to server
         OkHttpClient client = new OkHttpClient.Builder().build();
         HttpUrl.Builder urlBuilder;
-//        urlBuilder = HttpUrl.parse("https://jongseol-crypto.herokuapp.com/"+crypto).newBuilder();
-        urlBuilder = HttpUrl.parse("http://10.0.2.2:8080/"+crypto).newBuilder();
+        urlBuilder = HttpUrl.parse("http://3.39.61.211:8080/"+crypto).newBuilder();
         String url = urlBuilder.build().toString();
-        System.out.println(url);
 
         Request req = new Request.Builder().url(url).build();
         client.newCall(req).enqueue(new Callback() {
+
+            //get HTTP response from server
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 final String myResponse = response.body().string();
                 Gson gson = new GsonBuilder().create();
-                System.out.println(myResponse);
                 Type collectionType = new TypeToken<List<ExpectedPrice>>(){}.getType();
                 try{
                     expectedPrices = (List<ExpectedPrice>) new Gson()
@@ -403,8 +509,16 @@ public class PredictionFragment extends Fragment {
                             }
                         });
                     }
-                    System.out.println("zz" + expectedPrices.size());
-                    drawLineChart();
+                    drawLineChart();  //start to draw a line chart
+                    tomorrowPrice = expectedPrices.get(expectedPrices.size()-1).getPrice();
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            textView8.setText("Expected Crypto Price for Tomorrow : " + Utils.formatNumber(tomorrowPrice, 0, true, ','));
+                            textView8.setTextColor(Color.BLACK);
+                        }
+                    });
+
                     dialog.dismiss();
                 }catch (JsonSyntaxException e)
                 {

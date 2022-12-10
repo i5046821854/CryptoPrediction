@@ -4,14 +4,15 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+//Data base initialize file
 public class DBHelper extends SQLiteOpenHelper {
     public DBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
     }
 
+    //create table when the app begins
     @Override
     public void onCreate(SQLiteDatabase db) {
-        System.out.println("zz");
         String sql = "DROP TABLE if exists USERS";
         db.execSQL(sql);
 

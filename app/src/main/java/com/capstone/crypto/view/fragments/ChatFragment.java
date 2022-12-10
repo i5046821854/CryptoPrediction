@@ -37,26 +37,27 @@ public class ChatFragment extends Fragment {
 
     public static ArrayList<Chat> chatList;
     private static ChatListViewAdapter adapter;
-    ListView listView;
-    Context context;
-    Button sendBtn;
-    EditText chatText;
-    String userId;
-    TextView titleTxt;
-    FirebaseDatabase database;
-    DatabaseReference ref;
-    Integer image;
-    String nickname;
+    private ListView listView;
+    private Context context;
+    private Button sendBtn;
+    private EditText chatText;
+    private String userId;
+    private TextView titleTxt;
+    private FirebaseDatabase database;
+    private DatabaseReference ref;
+    private Integer image;
+    private String nickname;
     private String preference;
-    ChildEventListener listener;
+    private ChildEventListener listener;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         chatList = new ArrayList<>();
-        System.out.println("화면 시작!!");
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
+
+        //initialize variables
         titleTxt = view.findViewById(R.id.chatRoomTitle);
         listView = view.findViewById(R.id.chatListView);
         sendBtn = view.findViewById(R.id.sendBtn);
@@ -67,7 +68,6 @@ public class ChatFragment extends Fragment {
         preference = getArguments().getString("preference");
         image = getArguments().getInt("img");
         nickname = getArguments().getString("nickname");
-        System.out.println(userId);
         titleTxt.setText("Chat Room for " + preference.toUpperCase());
 
         database = FirebaseDatabase.getInstance();
@@ -75,17 +75,17 @@ public class ChatFragment extends Fragment {
 
         adapter = new ChatListViewAdapter(context, R.layout.chat_listview, chatList, userId, preference);
         listView.setAdapter(adapter);
+
+        //delete message
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
                 final int position = i;
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                //builder에게 옵션주기
                 builder.setTitle("Delete");
                 builder.setMessage("Do you want this message to be deleted?");
 
-                //3개 가능/ 메시지, 일어나야하는일
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int i) {
@@ -107,20 +107,20 @@ public class ChatFragment extends Fragment {
             }
         });
 
+        //send message
         sendBtn.setOnClickListener(thisView -> {
             Date today = new Date();
             SimpleDateFormat timeNow = new SimpleDateFormat("a K:mm");
-            System.out.println("zzzz");
             ref.push().setValue(new Chat(0, userId, nickname, chatText.getText().toString(), timeNow.format(today), preference, image));
-//            ref.push().setValue(new Chat(0, userId, chatText.getText().toString(), LocalDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG))));
             chatText.setText("");
         });
+
+
+        //listener when other users send message to DB
         listener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                System.out.println("애디드!!");
-                Chat value = dataSnapshot.getValue(Chat.class); // 괄호 안 : 꺼낼 자료 형태
-                System.out.println(value.getContent());
+                Chat value = dataSnapshot.getValue(Chat.class);
                 if(value.getCrypto().equals(preference)){
                     chatList.add(value);
                     adapter.notifyDataSetChanged();
@@ -128,47 +128,26 @@ public class ChatFragment extends Fragment {
             }
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                System.out.println("@@@@@@@@@child changed!");
                 ((MenuActivity)getActivity()).changeFrag(3, bundle);
             }
 
             @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
-            }
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {}
 
             @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
+            public void onCancelled(@NonNull DatabaseError error) {}
         };
 
         ref.addChildEventListener(listener);
         return view;
     }
 
-    private void refresh() {
-        FragmentTransaction fm = getFragmentManager().beginTransaction();
-        fm.detach(this).commitAllowingStateLoss();
-        fm.attach(this).commitAllowingStateLoss();
-    }
-
-
-    public static void changeValue(String id, int img){
-        chatList.stream().filter(chat -> chat.getId().equals(id))
-                .forEach(chat -> chat.setImage(img));
-        adapter.notifyDataSetChanged();
-    }
-    
 
     @Override
     public void onPause() {
-        System.out.println("paused");
         ref.removeEventListener(listener);
         super.onPause();
     }

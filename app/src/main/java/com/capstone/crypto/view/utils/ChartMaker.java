@@ -21,14 +21,13 @@ public class ChartMaker extends MarkerView {
     }
 
     // callbacks everytime the MarkerView is redrawn, can be used to update the
-    // content (user-interface)
     @Override
     public void refreshContent(Entry e, Highlight highlight) {
         float x = e.getX();
         float realPrice = HomeFragment.cryptoCurrencies.get((int)x).getClose();
         String date = HomeFragment.cryptoCurrencies.get((int)x).getTime();
         int len = date.length();
-        tvContent.setText("Date : " + date.substring(2,len)+ "\nPrice : " + Utils.formatNumber( realPrice, 0, true));
+        tvContent.setText("Date : " + date.substring(2,10)+ "\nPrice : " + Utils.formatNumber( realPrice, 0, true));
         super.refreshContent(e, highlight);
     }
 

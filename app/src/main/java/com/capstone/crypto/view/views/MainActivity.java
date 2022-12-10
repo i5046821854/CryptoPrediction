@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -33,16 +34,15 @@ public class MainActivity extends AppCompatActivity {
         Intent getIntent = getIntent();
         id = getIntent.getStringExtra("id");
         id = (id == null ? "leeyoungshin" : id);
-        System.out.println(id);
-        cryptoTxt = (TextView) findViewById(R.id.cryptoNameTxt);
-        searchBtn = (Button) findViewById(R.id.searchBtn);
-        imageView = (ImageView) findViewById(R.id.imageView3);
+        initVars();
 
+        //DB connection
         DBHelper helper;
         SQLiteDatabase db;
         helper = new DBHelper(MainActivity.this, "newdb.db", null, 1);
         db = helper.getWritableDatabase();
 
+        //find user info in DB
         Cursor cursor = db.rawQuery("SELECT * FROM USERS WHERE username = '" + id + "'", null);
         while(cursor.moveToNext()){
             id = cursor.getString(1);
@@ -52,23 +52,30 @@ public class MainActivity extends AppCompatActivity {
         }
         imageView.setImageResource(imgArr[image]);
         searchBtn.setText("Start With " + nickname);
+
         cryptoTxt.setOnClickListener(view ->{
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);
         });
     }
 
+    //move intent to main page
     public void search(View v){
         String crypto = cryptoTxt.getText().toString();
-//        Intent intent = new Intent(MainActivity.this, PriceActivity.class);
         Intent intent = new Intent(MainActivity.this, MenuActivity.class);
-        crypto = (preference == 1? "etherium" : "bitcoin");
+        crypto = (preference == 1? "ethereum" : "bitcoin");
         intent.putExtra("name", crypto);
         intent.putExtra("id", id);
         intent.putExtra("nickname", nickname);
         intent.putExtra("img", image);
-        System.out.println(crypto);
         startActivity(intent);
+    }
+
+    //initialize components
+    void initVars(){
+        cryptoTxt = (TextView) findViewById(R.id.cryptoNameTxt);
+        searchBtn = (Button) findViewById(R.id.searchBtn);
+        imageView = (ImageView) findViewById(R.id.imageView3);
     }
 
 }

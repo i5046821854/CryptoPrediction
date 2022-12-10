@@ -43,15 +43,12 @@ public class NewsFragment extends Fragment {
     private EditText cryptoTxt;
     private Button searchBtn;
     private ListView listView;
-    private LineChart chart;
     private Button articleBtn;
     private ProgressDialog dialog;
     private String name;
     private Button readFullBtn;
     private Integer crypto;
-//    private ArrayList<News> newsList;
     private List<Articles> newsList;
-    private ResponseModel responseModel;
     Context context;
 
     @Override
@@ -60,6 +57,8 @@ public class NewsFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_news, container, false);
         context = container.getContext();
+
+        // Initialize variables
         articleBtn = view.findViewById(R.id.articleBtn);
         listView = view.findViewById(R.id.listview);
         searchBtn = view.findViewById(R.id.articleBtn);
@@ -67,8 +66,9 @@ public class NewsFragment extends Fragment {
         dialog = new ProgressDialog(context);
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.setMessage("Data being processed...");
-
         initView();
+
+        // Generate List View for articles
         searchBtn.setOnClickListener(tempView -> {
             articleBtn.setVisibility(View.VISIBLE);
             newsList = new ArrayList<Articles>();
@@ -76,12 +76,15 @@ public class NewsFragment extends Fragment {
             String crypto = cryptoTxt.getText().toString();
             name = crypto;
         });
+
         articleBtn.setOnClickListener(tempView -> {
             searchNews();
         });
         return view;
     }
 
+
+    // ask server to make a list of articles
     void searchNews()
     {
         getActivity().runOnUiThread(new Runnable() {
@@ -90,12 +93,12 @@ public class NewsFragment extends Fragment {
                 dialog.show();
             }
         });
+
+        //send HTTP request to server to get articles
         OkHttpClient client = new OkHttpClient.Builder().connectTimeout(40, TimeUnit.SECONDS).writeTimeout(40, TimeUnit.SECONDS).readTimeout(40, TimeUnit.SECONDS).build();
         HttpUrl.Builder urlBuilder;
-//        urlBuilder = HttpUrl.parse("https://api.currentsapi.services/v1/search?keywords=" + name + "&language=en&apiKey=bUOAN1mHVyUahBl1LBy0uTDfcCtiYStsong5IkUzfUFErv5R").newBuilder();
-        urlBuilder = HttpUrl.parse("http://10.0.2.2:8080/news/" + crypto).newBuilder();
+        urlBuilder = HttpUrl.parse("http://3.39.61.211:8080/news/" + crypto).newBuilder();
         String url = urlBuilder.build().toString();
-        System.out.println(url);
         Request req = new Request.Builder().url(url).build();
 
         client.newCall(req).enqueue(new Callback() {
@@ -106,14 +109,11 @@ public class NewsFragment extends Fragment {
                 Type collectionType = new TypeToken<List<Articles>>(){}.getType();
                 newsList = (List<Articles>) new Gson()
                         .fromJson( myResponse , collectionType);
-                for(Articles n : newsList)
-                    System.out.println(n.getTitle());
                 NewsListViewAdapter newsListViewAdapter = new NewsListViewAdapter(context, newsList, 2);
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         listView.setAdapter(newsListViewAdapter);
-                        System.out.println("zzz");
                         articleBtn.setVisibility(View.INVISIBLE);
                         listView.setVisibility(View.VISIBLE);
                         dialog.dismiss();
@@ -128,6 +128,7 @@ public class NewsFragment extends Fragment {
             }
         });
     }
+
     void initView()
     {
         name = this.getArguments().getString("preference");
